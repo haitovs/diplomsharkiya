@@ -1,0 +1,1 @@
+Put event images/assets here if you want to load local files later.
