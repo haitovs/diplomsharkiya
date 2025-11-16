@@ -15,31 +15,145 @@ from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Mähallik Çäreler", page_icon="🎟️", layout="wide")
 
-# ---------- Maglumatlar ----------
-DATA_PATH = pathlib.Path(__file__).parent / "data" / "events.json"
-raw = json.loads(DATA_PATH.read_text(encoding="utf-8")) if DATA_PATH.exists() else []
-df = pd.DataFrame(raw)
+DEFAULT_CENTER = (37.9601, 58.3261)
+DEFAULT_RADIUS_KM = 0.0
+ALL_CITY_OPTION = "Ähli"
+DEFAULT_DATE_PRESET = "Ähli seneler"
+DEFAULT_SORT_OPTION = "Iň tiz başlanýan"
+DEFAULT_PRICE_CAP = 200
 
-if not df.empty:
-    df["date_start"] = pd.to_datetime(df["date_start"])
-    df["date_end"] = pd.to_datetime(df["date_end"])
+EXPECTED_COLUMNS = [
+    "id",
+    "title",
+    "category",
+    "city",
+    "venue",
+    "date_start",
+    "date_end",
+    "price",
+    "popularity",
+    "lat",
+    "lon",
+    "image",
+    "description",
+]
+TEXT_COLUMNS = ["id", "title", "category", "city", "venue", "image", "description"]
+NUMERIC_COLUMNS = ["price", "popularity"]
+FLOAT_COLUMNS = ["lat", "lon"]
+DATE_COLUMNS = ["date_start", "date_end"]
+
+DATA_PATH = pathlib.Path(__file__).parent / "data" / "events.json"
+
+
+def load_events(path: pathlib.Path) -> pd.DataFrame:
+    """Read and normalize events data from disk, guarding against malformed JSON."""
+    if not path.exists():
+        st.warning("`data/events.json` tapylmady – görkezmek üçin maglumat ýok.", icon="⚠️")
+        return pd.DataFrame(columns=EXPECTED_COLUMNS)
+
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        st.error(f"Çäreler faýlyny okap bolmady: {exc}", icon="🚫")
+        return pd.DataFrame(columns=EXPECTED_COLUMNS)
+
+    if not raw_text.strip():
+        st.warning("`data/events.json` faýly boş – görkezmek üçin maglumat ýok.", icon="⚠️")
+        return pd.DataFrame(columns=EXPECTED_COLUMNS)
+
+    try:
+        raw = json.loads(raw_text)
+    except json.JSONDecodeError as exc:
+        st.error(f"`data/events.json` JSON formatynda näsazlyk bar: {exc}", icon="🚫")
+        return pd.DataFrame(columns=EXPECTED_COLUMNS)
+
+    if not isinstance(raw, list):
+        st.error("`data/events.json` mazmuny san görnüşinde bolmaly.", icon="🚫")
+        return pd.DataFrame(columns=EXPECTED_COLUMNS)
+
+    df = pd.DataFrame(raw)
+    for col in EXPECTED_COLUMNS:
+        if col not in df.columns:
+            df[col] = None
+    df = df[EXPECTED_COLUMNS].copy()
+
+    if df.empty:
+        return df
+
+    for col in TEXT_COLUMNS:
+        df[col] = df[col].fillna("").astype(str)
+
+    for col in NUMERIC_COLUMNS:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+
+    for col in FLOAT_COLUMNS:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    for col in DATE_COLUMNS:
+        df[col] = pd.to_datetime(df[col], errors="coerce")
+
+    invalid_dates = df[DATE_COLUMNS].isna().any(axis=1)
+    if invalid_dates.any():
+        st.warning(
+            f"{invalid_dates.sum()} çäre senesi nädogry bolandygy üçin görkezilen sanawdan aýyryldy.",
+            icon="⚠️",
+        )
+        df = df.loc[~invalid_dates]
+
+    return df.reset_index(drop=True)
+
+# ---------- Maglumatlar ----------
+df = load_events(DATA_PATH)
 
 # ---------- Session state ----------
 if "saved_ids" not in st.session_state:
     st.session_state.saved_ids = set()
+elif not isinstance(st.session_state.saved_ids, set):
+    st.session_state.saved_ids = set(st.session_state.saved_ids)
 if "details_id" not in st.session_state:
     st.session_state.details_id = None
 # keep circle state between reruns
 if "circle_center" not in st.session_state:
     # Aşgabat merkezi hökmünde başla
-    st.session_state.circle_center = (37.9601, 58.3261)  # (lat, lon)
+    st.session_state.circle_center = DEFAULT_CENTER  # (lat, lon)
 if "circle_radius_km" not in st.session_state:
-    st.session_state.circle_radius_km = 0.0
+    st.session_state.circle_radius_km = DEFAULT_RADIUS_KM
+if "pending_radius_from_map" not in st.session_state:
+    st.session_state.pending_radius_from_map = None
+
+price_ceiling = DEFAULT_PRICE_CAP
+if not df.empty and "price" in df.columns:
+    price_max = df["price"].max()
+    if pd.notna(price_max):
+        try:
+            price_ceiling = int(math.ceil(float(price_max)))
+        except (TypeError, ValueError):
+            price_ceiling = DEFAULT_PRICE_CAP
+if price_ceiling < 0:
+    price_ceiling = DEFAULT_PRICE_CAP
+
+if "filter_city" not in st.session_state:
+    st.session_state.filter_city = ALL_CITY_OPTION
+if "filter_date" not in st.session_state:
+    st.session_state.filter_date = DEFAULT_DATE_PRESET
+if "filter_categories" not in st.session_state:
+    st.session_state.filter_categories = []
+if "filter_price" not in st.session_state:
+    st.session_state.filter_price = price_ceiling
+if "filter_search" not in st.session_state:
+    st.session_state.filter_search = ""
+if "filter_sort" not in st.session_state:
+    st.session_state.filter_sort = DEFAULT_SORT_OPTION if not df.empty else "Degişlilik"
+# keep sidebar radius widget state separate from map state
+if "filter_radius_input" not in st.session_state:
+    st.session_state.filter_radius_input = float(st.session_state.circle_radius_km)
 
 
 # ---------- Kömekçiler ----------
 def quick_date_filter(df: pd.DataFrame, preset: str) -> pd.DataFrame:
     if df.empty:
+        return df
+    if not preset or preset == DEFAULT_DATE_PRESET:
         return df
     today = pd.Timestamp(dt.datetime.now().date())
     if preset == "Şu gün":
@@ -59,14 +173,21 @@ def quick_date_filter(df: pd.DataFrame, preset: str) -> pd.DataFrame:
 
 def apply_filters(df: pd.DataFrame, city, categories, search, price_max_tmt, date_preset):
     out = df.copy()
-    if city != "Ähli":
+    if city and city != ALL_CITY_OPTION:
         out = out[out["city"] == city]
     if categories:
         out = out[out["category"].isin(categories)]
     if search:
-        s = search.lower()
-        out = out[out["title"].str.lower().str.contains(s) | out["venue"].str.lower().str.contains(s) | out["description"].str.lower().str.contains(s)]
-    out = out[out["price"] <= price_max_tmt]
+        pattern = search.strip()
+        if pattern:
+            mask = (
+                out["title"].str.contains(pattern, case=False, na=False)
+                | out["venue"].str.contains(pattern, case=False, na=False)
+                | out["description"].str.contains(pattern, case=False, na=False)
+            )
+            out = out[mask]
+    if price_max_tmt is not None:
+        out = out[out["price"] <= float(price_max_tmt)]
     out = quick_date_filter(out, date_preset)
     return out
 
@@ -95,11 +216,30 @@ def haversine_km(lat1, lon1, lat2, lon2):
 def filter_by_circle(df: pd.DataFrame, center_lat, center_lon, radius_km: float):
     if radius_km <= 0 or df.empty:
         return df
-    distances = df.apply(lambda r: haversine_km(center_lat, center_lon, float(r["lat"]), float(r["lon"])), axis=1)
+    candidates = df[df["lat"].notna() & df["lon"].notna()].copy()
+    if candidates.empty:
+        return candidates
+    distances = candidates.apply(
+        lambda r: haversine_km(center_lat, center_lon, float(r["lat"]), float(r["lon"])),
+        axis=1,
+    )
     keep = distances <= radius_km
-    out = df.loc[keep].copy()
+    out = candidates.loc[keep].copy()
     out["distance_km"] = distances[keep]
-    return out
+    return out.sort_values("distance_km")
+
+
+def reset_filter_state(price_limit: float) -> None:
+    st.session_state.filter_city = ALL_CITY_OPTION
+    st.session_state.filter_date = DEFAULT_DATE_PRESET
+    st.session_state.filter_categories = []
+    st.session_state.filter_price = int(price_limit)
+    st.session_state.filter_search = ""
+    st.session_state.filter_sort = DEFAULT_SORT_OPTION
+    st.session_state.circle_center = DEFAULT_CENTER
+    st.session_state.circle_radius_km = DEFAULT_RADIUS_KM
+    st.session_state.filter_radius_input = DEFAULT_RADIUS_KM
+    st.session_state.details_id = None
 
 
 # Namespaced widget keys so tabs never collide
@@ -114,6 +254,9 @@ def event_card(row, key_prefix: str):
         st.caption(f"{row['venue']} • {row['date_start'].strftime('%a, %d %b %H:%M')} — {row['date_end'].strftime('%H:%M')}")
         st.write(row["description"])
         st.caption(f"Meşhurlylyk: {row['popularity']} • Bahasy: {row['price']} TMT")
+        distance = row.get("distance_km") if hasattr(row, "get") else None
+        if distance is not None and not pd.isna(distance):
+            st.caption(f"Uzaklygy: {distance:.1f} km")
     with cols[2]:
         saved = row["id"] in st.session_state.saved_ids
         c1, c2, c3 = st.columns(3)
@@ -157,38 +300,75 @@ def details_panel(df: pd.DataFrame, event_id: str):
 # ---------- Sidebar ----------
 with st.sidebar:
     st.markdown("## Filtrler")
-    sehir_options = ["Ähli"] + (sorted(df["city"].unique().tolist()) if not df.empty else [])
-    city = st.selectbox("Şäherler", options=sehir_options, index=0)
+    city_options = [ALL_CITY_OPTION] + (sorted(df["city"].unique().tolist()) if not df.empty else [])
+    if st.session_state.filter_city not in city_options:
+        st.session_state.filter_city = ALL_CITY_OPTION
+    city = st.selectbox("Şäherler", options=city_options, key="filter_city")
 
-    date_preset = st.radio(
-        "Sene aralygy",
-        options=["Şu gün", "Ertir", "Bu hepde aýagy", "Indiki 7 gün", "Ähli seneler"],
-        index=4,
-    )
+    date_options = ["Şu gün", "Ertir", "Bu hepde aýagy", "Indiki 7 gün", DEFAULT_DATE_PRESET]
+    date_preset = st.radio("Sene aralygy", options=date_options, index=date_options.index(DEFAULT_DATE_PRESET), key="filter_date")
 
-    categories = st.multiselect("Kategoriýa", options=(sorted(df["category"].unique().tolist()) if not df.empty else []))
+    category_options = sorted(df["category"].unique().tolist()) if not df.empty else []
+    if st.session_state.filter_categories:
+        st.session_state.filter_categories = [c for c in st.session_state.filter_categories if c in category_options]
+    categories = st.multiselect("Kategoriýa", options=category_options, key="filter_categories")
 
+    if st.session_state.filter_price > price_ceiling:
+        st.session_state.filter_price = price_ceiling
+    if st.session_state.filter_price < 0:
+        st.session_state.filter_price = 0
+    price_step = 5 if price_ceiling >= 5 else 1
     price_max = st.slider(
         "Iň köp baha (TMT)",
         min_value=0,
-        max_value=int(df["price"].max()) if not df.empty else 200,
-        value=int(df["price"].max()) if not df.empty else 200,
-        step=5,
+        max_value=price_ceiling,
+        step=price_step,
+        key="filter_price",
     )
 
-    search = st.text_input("Gözleg", placeholder="Ady, ýerini ýa-da düşündirişi boýunça...")
+    search = st.text_input("Gözleg", placeholder="Ady, ýerini ýa-da düşündirişi boýunça...", key="filter_search")
 
-    sort_by = st.selectbox(
-        "Tertiplemek",
-        options=["Degişlilik", "Iň tiz başlanýan", "Baha (arzan → gymmat)", "Meşhurlylyk"],
-        index=1 if not df.empty else 0,
-    )
+    sort_options = ["Degişlilik", DEFAULT_SORT_OPTION, "Baha (arzan → gymmat)", "Meşhurlylyk"]
+    if st.session_state.filter_sort not in sort_options:
+        st.session_state.filter_sort = DEFAULT_SORT_OPTION
+    sort_by = st.selectbox("Tertiplemek", options=sort_options, key="filter_sort")
 
     st.markdown("---")
     st.markdown("### Radius boýunça Filtr (kartada)")
+    # apply any pending radius from map BEFORE rendering widget to avoid rewrite errors
+    if st.session_state.pending_radius_from_map is not None:
+        st.session_state.circle_radius_km = float(st.session_state.pending_radius_from_map)
+        st.session_state.filter_radius_input = float(st.session_state.pending_radius_from_map)
+        st.session_state.pending_radius_from_map = None
     # also let users tweak radius numerically
-    radius_km_number = st.number_input("Radius (km)", value=float(st.session_state.circle_radius_km), min_value=0.0, step=0.5, format="%.1f")
-    if st.button("Filtrleri täzeden aç"):
+    radius_km_number = float(
+        st.number_input(
+            "Radius (km)",
+            min_value=0.0,
+            step=0.5,
+            format="%.1f",
+            key="filter_radius_input",
+        )
+    )
+    # sync widget value into map state
+    if not math.isclose(radius_km_number, st.session_state.circle_radius_km, rel_tol=1e-9, abs_tol=1e-4):
+        st.session_state.circle_radius_km = radius_km_number
+
+    c_reset_center, c_reset_radius = st.columns(2)
+    with c_reset_center:
+        if st.button("Karta: Aşgabada getir", key="btn_reset_center"):
+            st.session_state.circle_center = DEFAULT_CENTER
+            st.session_state.circle_radius_km = DEFAULT_RADIUS_KM
+            st.session_state.pending_radius_from_map = DEFAULT_RADIUS_KM
+            st.rerun()
+    with c_reset_radius:
+        if st.button("Radiusy 0 km", key="btn_reset_radius"):
+            st.session_state.circle_radius_km = 0.0
+            st.session_state.pending_radius_from_map = 0.0
+            st.rerun()
+
+    if st.button("Filtrleri täzeden aç", type="secondary"):
+        reset_filter_state(price_ceiling)
         st.rerun()
 
 # ---------- Tabs ----------
@@ -199,8 +379,7 @@ if st.session_state.details_id:
     details_panel(df, st.session_state.details_id)
     st.divider()
 
-# Apply filters before map
-filtered = apply_filters(df, city, categories, search, price_max, date_preset)
+base_filtered = apply_filters(df, city, categories, search, price_max, date_preset)
 
 with tabs[1]:
     st.subheader("Karta — tegelek zony ")
@@ -208,22 +387,40 @@ with tabs[1]:
     center_lat, center_lon = st.session_state.circle_center
     m = folium.Map(location=[center_lat, center_lon], zoom_start=12, control_scale=True)
 
+    # Apply circle filter to the map view so pins match radius selection
+    filtered_for_map = filter_by_circle(base_filtered, center_lat, center_lon, radius_km_number)
+
+    # If no events satisfy filters, keep map but notify user
+    if filtered_for_map.empty:
+        st.info("Saýlanan radius/filtr boýunça kartada görkezmäge ýolbaşylar ýok.")
+
     # Pre-add our circle so user can edit/drag it
     if radius_km_number > 0:
         folium.Circle(
             location=[center_lat, center_lon],
-            radius=radius_km_number * 1000.0,  # km → m
+            radius=float(radius_km_number) * 1000.0,  # km → m
             color="#003366",
             weight=2,
             fill=True,
             fill_opacity=0.15,
             tooltip="Radius zona (sürükläp ýerini üýtgedip bilersiňiz)",
-        ).add_to(m)
+    ).add_to(m)
 
-    # Add event markers
-    for _, r in filtered.iterrows():
+    # Add event markers (already radius-filtered for the map view)
+    marker_coords = []
+    for _, r in filtered_for_map.iterrows():
+        if pd.isna(r["lat"]) or pd.isna(r["lon"]):
+            continue
+        start_label = r["date_start"].strftime("%Y-%m-%d %H:%M")
         popup = folium.Popup(
-            f"<b>{r['title']}</b><br/>{r['venue']}<br/>{r['date_start']}<br/>Baha: {r['price']} TMT",
+            "<br/>".join(
+                [
+                    f"<b>{r['title']}</b>",
+                    r["venue"],
+                    start_label,
+                    f"Baha: {r['price']} TMT",
+                ]
+            ),
             max_width=300,
         )
         folium.Marker(
@@ -231,6 +428,11 @@ with tabs[1]:
             tooltip=r["title"],
             popup=popup,
         ).add_to(m)
+        marker_coords.append([float(r["lat"]), float(r["lon"])])
+
+    if marker_coords:
+        # Fit to visible markers so users see the relevant area immediately
+        m.fit_bounds(marker_coords, padding=(20, 20))
 
     # Add Draw control (user can draw/edit/move the circle)
     Draw(
@@ -248,7 +450,13 @@ with tabs[1]:
         },
     ).add_to(m)
 
-    out = st_folium(m, height=520, use_container_width=True, returned_objects=["last_active_drawing", "all_drawings"])
+    out = st_folium(
+        m,
+        height=520,
+        use_container_width=True,
+        returned_objects=["last_active_drawing", "all_drawings"],
+        key="events-map",
+    )
 
     # Read back the circle the user edited/drew (draggable via Draw→Edit)
     new_center = None
@@ -256,11 +464,14 @@ with tabs[1]:
 
     # Prefer the last active drawing if available
     feature = (out or {}).get("last_active_drawing")
-    if not feature:
-        # Or fall back to all drawings (if any)
-        drawings = (out or {}).get("all_drawings", [])
-        if drawings:
-            feature = drawings[-1]
+    drawings = (out or {}).get("all_drawings", [])
+    if not feature and drawings:
+        # Or fall back to the latest drawing (if any)
+        feature = drawings[-1]
+    # If user removed everything, clear radius filter to avoid stale values
+    if not drawings and feature is None and radius_km_number > 0:
+        new_radius_km = 0.0
+        radius_km_number = 0.0
 
     if feature and isinstance(feature, dict):
         geom = feature.get("geometry", {})
@@ -290,17 +501,25 @@ with tabs[1]:
     # Update session state from either map or numeric field
     if new_center:
         st.session_state.circle_center = new_center
-    # numeric field overrides only if changed
-    st.session_state.circle_radius_km = float(radius_km_number if radius_km_number is not None else st.session_state.circle_radius_km)
     if new_radius_km is not None:
-        st.session_state.circle_radius_km = float(new_radius_km)
+        updated_radius = float(new_radius_km)
+        if not math.isclose(updated_radius, st.session_state.circle_radius_km, rel_tol=1e-9, abs_tol=1e-4):
+            st.session_state.circle_radius_km = updated_radius
+        # Defer syncing to widget (handled before widget render next rerun)
+        st.session_state.pending_radius_from_map = updated_radius
+        radius_km_number = updated_radius
 
     # Show current circle info
     st.caption(f"Merkez LAT/LON: {st.session_state.circle_center[0]:.6f}, {st.session_state.circle_center[1]:.6f} • "
                f"Radius: {st.session_state.circle_radius_km:.1f} km")
 
-# Now apply circle filter after map interactions
-filtered = filter_by_circle(filtered, st.session_state.circle_center[0], st.session_state.circle_center[1], st.session_state.circle_radius_km)
+# Now apply circle filter after map interactions (for list view)
+filtered = filter_by_circle(
+    base_filtered,
+    st.session_state.circle_center[0],
+    st.session_state.circle_center[1],
+    st.session_state.circle_radius_km,
+)
 filtered = apply_sort(filtered, sort_by)
 
 with tabs[0]:
