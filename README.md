@@ -1,55 +1,160 @@
-# RUN WITH
+# 🎟️ Sharkiya Event Discovery
 
-`python -m py_compile app.py`
-`streamlit run app.py`
+A modern event discovery platform for Turkmenistan. Find, explore, and save local events with an interactive map, powerful filters, and a full-featured admin panel.
 
-# Local Events Discovery — Streamlit Template (No Backend)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.9+-green)
+![Streamlit](https://img.shields.io/badge/streamlit-1.31+-red)
 
-A quick, fully-clickable **template** to showcase how a _Local Events Discovery_ app would work — using **static data only**.
-It includes search, filters (date/city/category), sorting, an interactive map, a **Favorites** view, and a
-details panel for each event. Everything runs locally — no backend or database.
+## ✨ Features
 
-## 🧰 Quickstart
+### User Features
+- **🗺️ Interactive Map** - Explore events on a Leaflet map with clustering, category-colored markers, and draw tools for radius filtering
+- **📋 Event List** - Browse events with rich cards showing all details
+- **🔍 Smart Filters** - Filter by city, category, date, price, and search
+- **📍 Location-Based Search** - Draw a circle on the map to find nearby events
+- **⭐ Save Events** - Save your favorite events for quick access
+- **📤 Share** - Share events with friends (coming soon)
 
-```bash
-# 1) Create a virtual environment (folder name: venv — not .venv)
-python -m venv venv
+### Admin Features
+- **📊 Dashboard** - Overview with statistics and charts
+- **📝 Event Management** - Create, edit, duplicate, and delete events
+- **📍 Map Location Picker** - Set event coordinates visually
+- **📥 Import/Export** - Bulk import from JSON, export for backup
+- **🔐 Secure Login** - Password-protected admin access
 
-# 2) Activate it
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
+## 🚀 Quick Start
 
-# 3) Install deps
-pip install -r requirements.txt
+### Prerequisites
+- Python 3.9 or higher
+- pip package manager
 
-# 4) Run
-streamlit run app.py
+### Installation
+
+1. **Clone or navigate to the project:**
+   ```bash
+   cd sharkiya-event-discovery
+   ```
+
+2. **Create a virtual environment (recommended):**
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   source venv/bin/activate  # macOS/Linux
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the application:**
+   ```bash
+   streamlit run main.py
+   ```
+
+5. **Access the app:**
+   - Main App: http://localhost:8501
+   - Admin Panel: Run `streamlit run admin.py` separately
+
+### Quick Run (Windows)
+Double-click `run.bat` to start the application.
+
+## 📁 Project Structure
+
+```
+sharkiya-event-discovery/
+├── app/                        # Core application modules
+│   ├── __init__.py
+│   ├── config.py               # Configuration & constants
+│   ├── models.py               # Pydantic data models
+│   ├── database.py             # Database operations
+│   └── utils.py                # Helper functions
+├── components/                 # Reusable UI components
+│   ├── __init__.py
+│   ├── ui_components.py        # Event cards, filters, etc.
+│   └── map_view.py             # Map rendering
+├── data/                       # Data storage
+│   └── events.db               # SQLite database (auto-created)
+├── main.py                     # Main application entry
+├── admin.py                    # Admin panel
+├── events.json                 # Event data (JSON)
+├── requirements.txt            # Python dependencies
+├── run.bat                     # Windows launcher
+└── README.md                   # This file
 ```
 
-The app uses static sample data in `data/events.json`. Edit it to change events.
+## 🎯 Default Settings
 
-## 📦 What’s inside
+- **Location:** Ashgabat, Turkmenistan (37.9601, 58.3261)
+- **Language:** English
+- **Currency:** TMT (Turkmen Manat)
 
--   `app.py` — the Streamlit UI
--   `data/events.json` — sample events (Warsaw-centric)
--   `assets/` — place images here if you want to reference local files later
--   `requirements.txt` — pinned deps
--   `README.md` — this file
+## 🔧 Configuration
 
-## 🧭 Features you can click
+Edit `app/config.py` to customize:
 
--   **Top bar**: city, quick dates (Today / Weekend / 7 days / All), category chips, search box
--   **Sorting**: soonest / price / popularity
--   **Event cards**: Details, Save, Share (simulated), Tickets (stub)
--   **Map**: toggle the Map tab to see event pins
--   **Favorites**: saved events via session state (no login)
+```python
+# Change default location
+DEFAULT_LAT = 37.9601  # Ashgabat
+DEFAULT_LON = 58.3261
 
-## 🛠️ Customize
+# Add cities
+CITIES = ["Ashgabat", "Mary", "Türkmenabat", ...]
 
--   Add/edit events in `data/events.json` (title, time, price, coords)
--   Tweak the UI quickly in `app.py` (tabs, filters, layout)
--   Replace placeholder images/emoji with your own assets in `assets/`
+# Customize categories
+CATEGORIES = {
+    "Music": {"icon": "🎵", "color": "#8B5CF6"},
+    ...
+}
+```
 
-Enjoy!
+## 🔐 Admin Access
+
+Default credentials:
+- **Username:** `admin`
+- **Password:** `admin123`
+
+⚠️ **Change the password in production!** Edit `ADMIN_PASSWORD` in `admin.py`.
+
+## 📊 API/Data Format
+
+Events are stored in JSON format:
+
+```json
+{
+    "id": "evt001",
+    "title": "Jazz Night at Riverside",
+    "category": "Music",
+    "city": "Ashgabat",
+    "venue": "Magtymguly Avenue — Riverside Park",
+    "date_start": "2025-12-28T19:30:00",
+    "date_end": "2025-12-28T22:00:00",
+    "price": 60,
+    "popularity": 84,
+    "lat": 37.9647,
+    "lon": 58.3409,
+    "image": "",
+    "description": "An outdoor evening with local jazz ensembles."
+}
+```
+
+## 🛠️ Technologies
+
+- **Frontend:** Streamlit
+- **Maps:** Folium, Leaflet
+- **Data:** Pandas, Pydantic
+- **Charts:** Plotly
+- **Database:** SQLite (optional)
+
+## 📝 License
+
+MIT License - feel free to use for your diploma project!
+
+## 👨‍💻 Author
+
+Made with ❤️ in Turkmenistan
+
+---
+
+*Version 2.0.0 - December 2024*

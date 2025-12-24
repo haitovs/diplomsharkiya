@@ -1,5 +1,26 @@
-streamlit==1.37.0
-pandas==2.2.2
-pydeck==0.9.1
-streamlit-folium==0.21.0
-folium==0.17.0
+# Sharkiya Event Discovery - Requirements
+# Python 3.9+
+
+# Core
+streamlit>=1.31.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Maps
+folium>=0.15.0
+streamlit-folium>=0.18.0
+
+# Data Validation
+pydantic>=2.5.0
+
+# Charts
+plotly>=5.18.0
+
+# Dates
+python-dateutil>=2.8.0
+
+# Images
+Pillow>=10.0.0
+
+# Security (for admin)
+bcrypt>=4.1.0

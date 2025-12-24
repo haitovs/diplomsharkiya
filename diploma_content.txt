@@ -1,0 +1,27 @@
+CONTENT
+INTRODUCTION	7
+CHAPTER I. TECHNOLOGIES AND CLIENT-SIDE TOOLS USED	11
+1.1 Why Streamlit fits rapid event-discovery prototypes	11
+1.2 Python data handling with pandas and JSON normalization	18
+1.3 Map rendering with Folium and geofenced filtering	24
+1.4 Session state, caching, and UI composition in Streamlit	31
+CHAPTER II. INTRODUCING THE "LOCAL EVENTS" CONCEPT	38
+2.1 User scenarios, target audience, and value proposition	38
+2.2 Core flows: search, filters, favorites, and sharing	41
+2.3 Offline-first static dataset and mock integrations roadmap	46
+2.4 Accessibility, localization (Turkmen-first), and usability choices	50
+CHAPTER III. DEVELOPMENT AND FEATURE IMPLEMENTATION	56
+3.1 Data model, validation pipeline, and error handling	56
+3.2 Filtering, sorting, and free-text search logic	62
+3.3 Interactive map radius selection and venue visualization	67
+3.4 Session persistence, ticket stubs, and analytics hooks	72
+CONCLUSION	76
+RECOMMENDATIONS	78
+REFERENCES	80
+
+
+ABSTRACT
+
+	The project delivers a fully clickable diploma prototype of a “Sharkiya Local Events” discovery app built with Streamlit and pure client-side data. At startup (`app.py`), the app configures a wide-layout Streamlit page and reads event definitions from `data/events.json`, validating columns and cleaning malformed rows before exposing them to the UI. The interface is organized into search and filter bars (city, quick dates, category chips, price ceiling, free-text search), sorting controls, an event list, a details panel, and an interactive Folium map with a draggable radius for geofenced discovery. State is preserved via Streamlit session state, enabling favorites management, persistent radius controls, and remembered detail selections without a backend.
+	Data handling relies on pandas for normalization, date parsing, and numeric coercion, while Folium (with `streamlit_folium`) renders the map, pins, and a live-updated search circle. Helper functions encapsulate quick date presets, predicate-based filtering, and stable sorting for repeatable results during a defense. Error handling is user-facing: missing files, empty JSON, or invalid dates trigger warnings instead of crashes, ensuring the prototype remains demo-ready even with imperfect data.
+	The prototype emphasizes an offline-first approach suitable for diploma defense: all interactions use static JSON, simulated ticket links, and share buttons, making the experience deterministic yet realistic. Localization favors Turkmen labels and copy, underscoring regional relevance. Together, Streamlit’s declarative UI, pandas-based validation, Folium visualization, and disciplined session-state management illustrate a complete lifecycle for a local events explorer—covering concept definition, user motivation, interface design, data resilience, and interactive spatial filtering without relying on external services.
