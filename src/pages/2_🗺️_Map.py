@@ -76,9 +76,20 @@ else:
                  # For now, let's stick to default style unless custom icon is set.
                  icon_obj = folium.Icon(color='blue', icon='info-sign')
 
+             # Rich Popup
+             popup_html = f"""
+             <div style="width:200px">
+                 <h4>{row['title']}</h4>
+                 <p><b>📍 {row.get('venue', '')}</b></p>
+                 <p>📅 {row.get('date_start', '').split('T')[0] if 'T' in str(row.get('date_start', '')) else row.get('date_start', '')}</p>
+                 <p>{row.get('description', '')[:100]}...</p>
+                 <p><b>💰 {row.get('price', 0)} TMT</b></p>
+             </div>
+             """
+             
              folium.Marker(
                 [row['lat'], row['lon']],
-                popup=row['title'],
+                popup=folium.Popup(popup_html, max_width=250),
                 tooltip=f"{row['title']} ({row['price']} TMT)",
                 icon=icon_obj
             ).add_to(m)

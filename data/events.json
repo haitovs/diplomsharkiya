@@ -12,7 +12,8 @@
     "lat": 37.9647,
     "lon": 58.3409,
     "image": "",
-    "description": "An outdoor evening with local jazz ensembles. Bring your own blanket or rent seating on-site."
+    "description": "An outdoor evening with local jazz ensembles. Bring your own blanket or rent seating on-site.",
+    "icon": "music"
   },
   {
     "id": "evt002",
@@ -27,7 +28,8 @@
     "lat": 37.9591,
     "lon": 58.3368,
     "image": "",
-    "description": "AI presentations, lightning talks, and networking night for tech enthusiasts."
+    "description": "AI presentations, lightning talks, and networking night for tech enthusiasts.",
+    "icon": "tech"
   },
   {
     "id": "evt003",
@@ -57,7 +59,8 @@
     "lat": 37.9119,
     "lon": 58.3007,
     "image": "",
-    "description": "Local teams face off in an exciting match — expect an electrifying atmosphere."
+    "description": "Local teams face off in an exciting match — expect an electrifying atmosphere.",
+    "icon": "sports"
   },
   {
     "id": "evt005",
@@ -72,7 +75,8 @@
     "lat": 37.9389,
     "lon": 58.3481,
     "image": "",
-    "description": "Guided tour of exhibits with short talks and photo opportunities."
+    "description": "Guided tour of exhibits with short talks and photo opportunities.",
+    "icon": "art"
   },
   {
     "id": "evt006",
@@ -87,7 +91,8 @@
     "lat": 37.9655,
     "lon": 58.3269,
     "image": "",
-    "description": "Explore urban art installations around the historic railway station."
+    "description": "Explore urban art installations around the historic railway station.",
+    "icon": "art"
   },
   {
     "id": "evt007",
@@ -102,7 +107,8 @@
     "lat": 37.9578,
     "lon": 58.3299,
     "image": "",
-    "description": "Try modern games, meet game developers, free pizza included!"
+    "description": "Try modern games, meet game developers, free pizza included!",
+    "icon": "tech"
   },
   {
     "id": "evt008",
@@ -162,7 +168,8 @@
     "lat": 37.9493,
     "lon": 58.3207,
     "image": "",
-    "description": "National orchestra performance celebrating the New Year."
+    "description": "National orchestra performance celebrating the New Year.",
+    "icon": "music"
   },
   {
     "id": "evt012",
@@ -192,7 +199,8 @@
     "lat": 37.9483,
     "lon": 58.3122,
     "image": "",
-    "description": "Learn popular K-pop choreography at an affordable price."
+    "description": "Learn popular K-pop choreography at an affordable price.",
+    "icon": "music"
   },
   {
     "id": "evt014",
@@ -237,7 +245,8 @@
     "lat": 37.8892,
     "lon": 58.2641,
     "image": "",
-    "description": "5 km running marathon with water stations and medals for top 3 finishers."
+    "description": "5 km running marathon with water stations and medals for top 3 finishers.",
+    "icon": "sports"
   },
   {
     "id": "evt017",
@@ -252,7 +261,8 @@
     "lat": 37.9584,
     "lon": 58.3233,
     "image": "",
-    "description": "Short sketching workshop — pencils and paper provided."
+    "description": "Short sketching workshop — pencils and paper provided.",
+    "icon": "art"
   },
   {
     "id": "evt018",
@@ -312,7 +322,8 @@
     "lat": 37.9417,
     "lon": 58.3284,
     "image": "",
-    "description": "Relaxing evening with oud musicians — tea set included."
+    "description": "Relaxing evening with oud musicians — tea set included.",
+    "icon": "music"
   },
   {
     "id": "evt022",
@@ -327,7 +338,8 @@
     "lat": 37.9636,
     "lon": 58.3215,
     "image": "",
-    "description": "HTML/CSS/JS practical session for beginners."
+    "description": "HTML/CSS/JS practical session for beginners.",
+    "icon": "tech"
   },
   {
     "id": "evt023",
@@ -342,7 +354,8 @@
     "lat": 37.9761,
     "lon": 58.3098,
     "image": "",
-    "description": "3×3 basketball tournament — prizes for winners."
+    "description": "3×3 basketball tournament — prizes for winners.",
+    "icon": "sports"
   },
   {
     "id": "evt024",
@@ -357,7 +370,8 @@
     "lat": 37.9567,
     "lon": 58.3336,
     "image": "",
-    "description": "Hand ceramics workshop — take your finished piece home."
+    "description": "Hand ceramics workshop — take your finished piece home.",
+    "icon": "art"
   },
   {
     "id": "evt025",
@@ -372,7 +386,8 @@
     "lat": 37.9642,
     "lon": 58.356,
     "image": "",
-    "description": "UI/UX prototyping and idea exchange for design teams."
+    "description": "UI/UX prototyping and idea exchange for design teams.",
+    "icon": "tech"
   },
   {
     "id": "evt026",
@@ -417,7 +432,8 @@
     "lat": 39.5104,
     "lon": 54.3672,
     "image": "",
-    "description": "Local rock bands, open stage, and light show."
+    "description": "Local rock bands, open stage, and light show.",
+    "icon": "music"
   },
   {
     "id": "evt029",
@@ -447,7 +463,8 @@
     "lat": 40.0224,
     "lon": 52.9693,
     "image": "",
-    "description": "Beach volleyball, DJ sets, and prizes for participants."
+    "description": "Beach volleyball, DJ sets, and prizes for participants.",
+    "icon": "sports"
   },
   {
     "id": "evt031",
@@ -492,7 +509,8 @@
     "lat": 37.948,
     "lon": 58.3379,
     "image": "",
-    "description": "Night photography walk — any camera or phone welcome."
+    "description": "Night photography walk — any camera or phone welcome.",
+    "icon": "art"
   },
   {
     "id": "evt034",
@@ -507,7 +525,8 @@
     "lat": 37.9324,
     "lon": 58.3534,
     "image": "",
-    "description": "Creative dance compositions and art exhibition."
+    "description": "Creative dance compositions and art exhibition.",
+    "icon": "art"
   },
   {
     "id": "evt035",
@@ -537,7 +556,8 @@
     "lat": 37.9445,
     "lon": 58.3831,
     "image": "",
-    "description": "City bike ride — bring your lit gear!"
+    "description": "City bike ride — bring your lit gear!",
+    "icon": "sports"
   },
   {
     "id": "evt037",
@@ -582,7 +602,8 @@
     "lat": 41.8362,
     "lon": 59.9674,
     "image": "",
-    "description": "Holiday concert with national music and dance groups."
+    "description": "Holiday concert with national music and dance groups.",
+    "icon": "music"
   },
   {
     "id": "evt040",
@@ -627,7 +648,8 @@
     "lat": 37.6009,
     "lon": 61.8205,
     "image": "",
-    "description": "Open-air drama in good weather — local actors performing."
+    "description": "Open-air drama in good weather — local actors performing.",
+    "icon": "art"
   },
   {
     "id": "evt043",
@@ -642,7 +664,8 @@
     "lat": 39.0821,
     "lon": 63.5759,
     "image": "",
-    "description": "Algorithm exercises, pair programming, and Q&A sessions."
+    "description": "Algorithm exercises, pair programming, and Q&A sessions.",
+    "icon": "tech"
   },
   {
     "id": "evt0c33e0",
@@ -658,6 +681,22 @@
     "lon": 58.3261,
     "image": "",
     "icon": "music",
+    "description": ""
+  },
+  {
+    "id": "evte91932",
+    "title": "Edited Title",
+    "category": "Art",
+    "city": "Ashgabat",
+    "venue": "Bazzeti",
+    "date_start": "2026-02-20T18:00:00",
+    "date_end": "2026-02-21T21:00:00",
+    "price": 0.0,
+    "popularity": 50,
+    "lat": 37.9601,
+    "lon": 58.3261,
+    "image": "",
+    "icon": "art",
     "description": ""
   }
 ]

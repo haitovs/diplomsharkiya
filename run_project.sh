@@ -47,4 +47,5 @@ echo "📂 Working directory: $(pwd)/src"
 cd src
 
 # Run streamlit
-$PYTHON_CMD -m streamlit run main.py --server.port=8502 --browser.gatherUsageStats=false
+# Run streamlit
+$PYTHON_CMD -m streamlit run "0_🏠_Home.py" --server.port=8502 --browser.gatherUsageStats=false

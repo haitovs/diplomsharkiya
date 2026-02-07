@@ -172,7 +172,10 @@ with tabs[1]:
         admin_search = st.text_input("Search", key="admin_search")
     
     # Filter events
-    display_events = events.copy()
+    # Default Sort: Latest first (Reverse order of list)
+    # We create a display list, reversing the original events list which is usually chronological if appended
+    display_events = events[::-1]
+    
     if admin_city != "All":
         display_events = [e for e in display_events if e.get("city") == admin_city]
     if admin_cat != "All":
@@ -215,7 +218,30 @@ with tabs[1]:
                         st.rerun()
                 
                 with act_cols[1]:
-                    pass  # Edit would require more complex form
+                    with st.expander("✏️ Edit"):
+                        with st.form(key=f"edit_{event['id']}"):
+                            e_title = st.text_input("Title", value=event.get("title", ""))
+                            e_venue = st.text_input("Venue", value=event.get("venue", ""))
+                            e_price = st.number_input("Price", value=float(event.get("price", 0)))
+                            e_desc = st.text_area("Description", value=event.get("description", ""))
+                            
+                            # Icon edit
+                            e_icon = st.selectbox("Icon", ["Default", "music", "art", "tech", "sports", "business"], 
+                                                index=["Default", "music", "art", "tech", "sports", "business"].index(event.get("icon", "Default")) if event.get("icon") in ["music", "art", "tech", "sports", "business"] else 0)
+                            
+                            if st.form_submit_button("💾 Save"):
+                                for i, e in enumerate(events):
+                                    if e["id"] == event["id"]:
+                                        events[i]["title"] = e_title
+                                        events[i]["venue"] = e_venue
+                                        events[i]["price"] = e_price
+                                        events[i]["description"] = e_desc
+                                        if e_icon != "Default":
+                                            events[i]["icon"] = e_icon
+                                        break
+                                save_events(events)
+                                st.success("Saved!")
+                                st.rerun()
                 
                 with act_cols[2]:
                     if st.button("🗑️ Delete", key=f"del_{event['id']}", use_container_width=True, type="secondary"):
@@ -353,6 +379,42 @@ with tabs[3]:
                 st.error(f"Error: {e}")
     
     st.divider()
+    
+    # ============ Maintenance ============
+    st.markdown("#### 🛠️ Maintenance")
+    with st.expander("🎨 Auto-Assign Icons"):
+        st.info("This will assign icons to events based on their category (e.g., 'Music' -> 'music.png').")
+        if st.button("🚀 Run Auto-Assign", type="primary"):
+            updated_count = 0
+            icon_path = pathlib.Path("assets/icons")
+            if not icon_path.exists():
+                st.error("Assets folder not found!")
+            else:
+                available_icons = {f.stem.lower(): f.stem for f in icon_path.glob("*.png")}
+                
+                for e in events:
+                    cat = e.get("category", "").lower()
+                    current_icon = e.get("icon", "")
+                    
+                    # Mapping logic
+                    assigned = ""
+                    if cat in available_icons:
+                        assigned = available_icons[cat]
+                    elif "music" in cat: assigned = "music"
+                    elif "art" in cat: assigned = "art"
+                    elif "tech" in cat: assigned = "tech"
+                    elif "sport" in cat: assigned = "sports"
+                    
+                    if assigned and not current_icon:
+                        e["icon"] = assigned
+                        updated_count += 1
+                
+                if updated_count > 0:
+                    save_events(events)
+                    st.success(f"✅ Assigned icons to {updated_count} events!")
+                    st.rerun()
+                else:
+                    st.warning("No events needed updates (or no matching icons found).")
     
     # Danger zone
     st.markdown("#### ⚠️ Danger Zone")
