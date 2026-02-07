@@ -1,45 +1,50 @@
 # 🎟️ Sharkiya Event Discovery
 
-A modern event discovery platform for Turkmenistan. Find, explore, and save local events with an interactive map, powerful filters, and a full-featured admin panel.
+**A modern event discovery platform for Turkmenistan**  
+Find, explore, and manage local events with an interactive map, powerful filters, and admin panel.
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
 ![Python](https://img.shields.io/badge/python-3.9+-green)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.31+-red)
 
+---
+
 ## ✨ Features
 
-### User Features
-- **🗺️ Interactive Map** - Explore events on a Leaflet map with clustering, category-colored markers, and draw tools for radius filtering
-- **📋 Event List** - Browse events with rich cards showing all details
-- **🔍 Smart Filters** - Filter by city, category, date, price, and search
-- **📍 Location-Based Search** - Draw a circle on the map to find nearby events
-- **⭐ Save Events** - Save your favorite events for quick access
-- **📤 Share** - Share events with friends (coming soon)
+### 🎯 User Features
+- **🗺️ Interactive Map** - Leaflet map with category-colored markers and radius filtering
+- **📋 Event Browsing** - Beautiful event cards with category badges and styled pricing  
+- **🔍 Smart Filters** - Filter by city, category, date range, and price
+- **📍 Radius Search** - Draw circles on map to find nearby events
+- **⭐ Save Events** - Bookmark favorites for quick access
+- **📤 Share** - Share event locations via Google Maps link
+- **🎨 Modern UI** - Professional design with color-coded categories
 
-### Admin Features
-- **📊 Dashboard** - Overview with statistics and charts
-- **📝 Event Management** - Create, edit, duplicate, and delete events
-- **📍 Map Location Picker** - Set event coordinates visually
-- **📥 Import/Export** - Bulk import from JSON, export for backup
-- **🔐 Secure Login** - Password-protected admin access
+### 🔧 Admin Features  
+- **📝 Event Management** - Full CRUD operations
+- **🗺️ Map Location Picker** - Visual coordinate selection
+- **📊 Dashboard** - Statistics and analytics (planned)
+- **📥 Import/Export** - JSON data management
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.9 or higher
+- Python 3.9+
 - pip package manager
 
 ### Installation
 
-1. **Clone or navigate to the project:**
+1. **Navigate to  project:**
    ```bash
    cd sharkiya-event-discovery
    ```
 
-2. **Create a virtual environment (recommended):**
+2. **Create virtual environment (recommended):**
    ```bash
    python -m venv venv
-   venv\Scripts\activate  # Windows
+   venv\\Scripts\\activate  # Windows
    source venv/bin/activate  # macOS/Linux
    ```
 
@@ -50,111 +55,172 @@ A modern event discovery platform for Turkmenistan. Find, explore, and save loca
 
 4. **Run the application:**
    ```bash
-   streamlit run main.py
+   streamlit run app.py --server.port 8502
    ```
 
-5. **Access the app:**
-   - Main App: http://localhost:8501
-   - Admin Panel: Run `streamlit run admin.py` separately
+5. **Access at:** [http://localhost:8502](http://localhost:8502)
 
 ### Quick Run (Windows)
-Double-click `run.bat` to start the application.
+Double-click `start.bat` to launch automatically.
+
+---
 
 ## 📁 Project Structure
 
 ```
 sharkiya-event-discovery/
-├── app/                        # Core application modules
-│   ├── __init__.py
-│   ├── config.py               # Configuration & constants
-│   ├── models.py               # Pydantic data models
-│   ├── database.py             # Database operations
-│   └── utils.py                # Helper functions
-├── components/                 # Reusable UI components
-│   ├── __init__.py
-│   ├── ui_components.py        # Event cards, filters, etc.
-│   └── map_view.py             # Map rendering
-├── data/                       # Data storage
-│   └── events.db               # SQLite database (auto-created)
-├── main.py                     # Main application entry
-├── admin.py                    # Admin panel
-├── events.json                 # Event data (JSON)
-├── requirements.txt            # Python dependencies
-├── run.bat                     # Windows launcher
-└── README.md                   # This file
+├── app.py                  # Main Streamlit application
+├── admin.py                # Admin panel (separate)
+├── config.py               # Configuration settings
+├── state_manager.py        # Session state management
+├── events.json             # Event data storage
+├── requirements.txt        # Python dependencies
+├── start.bat               # Windows launcher
+└── README.md               # This file
 ```
 
-## 🎯 Default Settings
+---
+
+## 🎯 Recent Updates (v2.1.0)
+
+### Sprint 1: Critical Fixes ✅
+- Fixed session state warnings
+- Improved button layout (no more vertical text wrapping)
+- Moved search to top of sidebar
+- Added bordered event card containers
+- Enhanced visual hierarchy with headings and emojis
+
+### Sprint 2: Visual Polish ✅
+- **Category Color Badges** - 8 distinct colors for easy identification
+- **Enhanced Price Display** - "MUGT" for free, gold styling for paid
+- **Modal Dialogs** - Professional `@st.dialog` implementation for event details
+- **Larger Tab Buttons** - 50px height, bold text, active state highlighting
+- **Working Share Button** - Generates Google Maps links with coordinates
+
+### Final Enhancements ✅
+- Map loading spinner and error handling
+- Improved tab navigation with bigger, more prominent buttons
+- Share functionality now shows clickable links
+
+---
+
+## 🎨 Category Colors
+
+| Category | Color | Badge |
+|----------|-------|-------|
+| Wellness | Green (#10b981) | 🎫 |
+| Music | Purple (#8b5cf6) | 🎵 |
+| Art | Pink (#ec4899) | 🎨 |
+| Sports | Blue (#3b82f6) | ⚽ |
+| Tech | Indigo (#6366f1) | 💻 |
+| Business | Amber (#f59e0b) | 💼 |
+| Food | Orange (#f97316) | 🍽️ |
+| Market | Teal (#14b8a6) | 🛍️ |
+
+---
+
+## 🗺️ Default Settings
 
 - **Location:** Ashgabat, Turkmenistan (37.9601, 58.3261)
-- **Language:** English
+- **Language:** Turkmen (UI), English event support
 - **Currency:** TMT (Turkmen Manat)
+- **Map:** OpenStreetMap tiles via Folium
 
-## 🔧 Configuration
-
-Edit `app/config.py` to customize:
-
-```python
-# Change default location
-DEFAULT_LAT = 37.9601  # Ashgabat
-DEFAULT_LON = 58.3261
-
-# Add cities
-CITIES = ["Ashgabat", "Mary", "Türkmenabat", ...]
-
-# Customize categories
-CATEGORIES = {
-    "Music": {"icon": "🎵", "color": "#8B5CF6"},
-    ...
-}
-```
+---
 
 ## 🔐 Admin Access
+
+Run admin panel separately:
+```bash
+streamlit run admin.py
+```
 
 Default credentials:
 - **Username:** `admin`
 - **Password:** `admin123`
 
-⚠️ **Change the password in production!** Edit `ADMIN_PASSWORD` in `admin.py`.
+⚠️ **Change password in production!**
 
-## 📊 API/Data Format
+---
 
-Events are stored in JSON format:
+## 🛠️ Technologies
+
+- **Frontend:** Streamlit 1.31+
+- **Maps:** Folium, Leaflet, streamlit-folium
+- **Data:** Pandas, Pydantic
+- **Database:** JSON (future: SQLite)
+
+---
+
+## 📦 Distribution
+
+For portable distribution without Python installation, see distribution strategies:
+
+### Option A: Python + Launcher (Recommended)
+- Size: ~50KB (before dependencies)
+- User needs: Python 3.8+
+- Install time: 2 minutes (auto-installs packages)
+- Total disk: ~150MB
+
+### Option B: PyInstaller Executable
+- Size: 3+ GB
+- User needs: Nothing
+- Distribution: Copy folder
+- Total disk: 3+ GB
+
+**Recommendation:** Use Option A for 60x smaller size and easier maintenance!
+
+---
+
+## 📝 Event Data Format
+
+Events stored in `events.json`:
 
 ```json
 {
     "id": "evt001",
-    "title": "Jazz Night at Riverside",
-    "category": "Music",
+    "title": "Yoga in the Park (All Levels)",
+    "category": "Wellness",
     "city": "Ashgabat",
-    "venue": "Magtymguly Avenue — Riverside Park",
-    "date_start": "2025-12-28T19:30:00",
-    "date_end": "2025-12-28T22:00:00",
-    "price": 60,
-    "popularity": 84,
+    "venue": "Bagtyýarlyk Park",
+    "date_start": "2025-12-25T10:00:00",
+    "date_end": "2025-12-25T11:15:00",
+    "price": 18,
+    "popularity": 56,
     "lat": 37.9647,
     "lon": 58.3409,
     "image": "",
-    "description": "An outdoor evening with local jazz ensembles."
+    "description": "Bring your mat, relax in nature..."
 }
 ```
 
-## 🛠️ Technologies
+---
 
-- **Frontend:** Streamlit
-- **Maps:** Folium, Leaflet
-- **Data:** Pandas, Pydantic
-- **Charts:** Plotly
-- **Database:** SQLite (optional)
+## 🐛 Troubleshooting
 
-## 📝 License
+### Map doesn't load
+- Check internet connection (map tiles require online access)
+- Wait for loading spinner
+- Check browser console for errors
 
-MIT License - feel free to use for your diploma project!
+### Share button doesn't work
+- Ensure event has valid coordinates (lat/lon)
+- Check if coordinates are within Turkmenistan bounds
 
-## 👨‍💻 Author
-
-Made with ❤️ in Turkmenistan
+### Search doesn't work
+- Verify `events.json` is not corrupted
+- Check search box is at top of sidebar
+- Try clearing browser cache
 
 ---
 
-*Version 2.0.0 - December 2024*
+## 📄 License
+
+MIT License - Feel free to use for educational/diploma projects!
+
+---
+
+## 👨‍💻 Author
+
+Made with ❤️ for Turkmenistan diploma project  
+*Version 2.1.0 - January 2026*

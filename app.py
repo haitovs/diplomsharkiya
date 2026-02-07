@@ -15,15 +15,54 @@ from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Mähallik Çäreler", page_icon="🎟️", layout="wide")
 
-# Custom CSS for equal-width buttons
+# Custom CSS for better UI
 st.markdown("""
 <style>
 div[data-testid="column"] > div > div > div > button {
     width: 100%;
     min-height: 40px;
+    white-space: nowrap;
+}
+/* Improve card visual hierarchy */
+.stMarkdown h3 {
+    margin-bottom: 0.5rem;
+}
+/* Better spacing */
+.stButton > button {
+    font-size: 0.875rem;
+}
+/* Make tab buttons BIGGER and more prominent */
+button[data-baseweb="tab"] {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    padding: 12px 24px !important;
+    min-height: 50px !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+    background-color: rgba(99, 102, 241, 0.1) !important;
+    border-bottom: 3px solid #6366f1 !important;
+}
+/* Map container styling */
+.stMap > div {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
 }
 </style>
 """, unsafe_allow_html=True)
+
+# Initialize session state FIRST (before any widgets)
+if "filter_date" not in st.session_state:
+    st.session_state.filter_date = "Ählisi"
+if "saved_ids" not in st.session_state:
+    st.session_state.saved_ids = set()
+if "details_id" not in st.session_state:
+    st.session_state.details_id = None
+if "circle_center" not in st.session_state:
+    st.session_state.circle_center = (37.9601, 58.3261)  # Ashgabat
+if "circle_radius_km" not in st.session_state:
+    st.session_state.circle_radius_km = 0.0
+if "had_map_drawings" not in st.session_state:
+    st.session_state.had_map_drawings = False
 
 # App Header
 st.markdown("# 🎟️ Mähallik Çäreler")
@@ -56,6 +95,19 @@ TEXT_COLUMNS = ["id", "title", "category", "city", "venue", "image", "descriptio
 NUMERIC_COLUMNS = ["price", "popularity"]
 FLOAT_COLUMNS = ["lat", "lon"]
 DATE_COLUMNS = ["date_start", "date_end"]
+
+# Category color mapping for visual distinction
+CATEGORY_COLORS = {
+    "Wellness": "#10b981",      # Green
+    "Music": "#8b5cf6",         # Purple  
+    "Art": "#ec4899",           # Pink
+    "Sports": "#3b82f6",        # Blue
+    "Tech": "#6366f1",          # Indigo
+    "Business": "#f59e0b",      # Amber
+    "Food": "#f97316",          # Orange
+    "Market": "#14b8a6",        # Teal
+    "default": "#6b7280"        # Gray
+}
 
 DATA_PATH = pathlib.Path(__file__).parent / "events.json"
 
@@ -120,21 +172,10 @@ def load_events(path: pathlib.Path) -> pd.DataFrame:
 # ---------- Maglumatlar ----------
 df = load_events(DATA_PATH)
 
-# ---------- Session state ----------
-if "saved_ids" not in st.session_state:
-    st.session_state.saved_ids = set()
-elif not isinstance(st.session_state.saved_ids, set):
+# ---------- Session state (additional filter states) ----------
+# Core states already initialized at top
+if not isinstance(st.session_state.saved_ids, set):
     st.session_state.saved_ids = set(st.session_state.saved_ids)
-if "details_id" not in st.session_state:
-    st.session_state.details_id = None
-# keep circle state between reruns
-if "circle_center" not in st.session_state:
-    # Aşgabat merkezi hökmünde başla
-    st.session_state.circle_center = DEFAULT_CENTER  # (lat, lon)
-if "circle_radius_km" not in st.session_state:
-    st.session_state.circle_radius_km = DEFAULT_RADIUS_KM
-if "had_map_drawings" not in st.session_state:
-    st.session_state.had_map_drawings = False
 
 price_ceiling = DEFAULT_PRICE_CAP
 if not df.empty and "price" in df.columns:
@@ -149,8 +190,6 @@ if price_ceiling < 0:
 
 if "filter_city" not in st.session_state:
     st.session_state.filter_city = ALL_CITY_OPTION
-if "filter_date" not in st.session_state:
-    st.session_state.filter_date = DEFAULT_DATE_PRESET
 if "filter_categories" not in st.session_state:
     st.session_state.filter_categories = []
 if "filter_price" not in st.session_state:
@@ -159,7 +198,6 @@ if "filter_search" not in st.session_state:
     st.session_state.filter_search = ""
 if "filter_sort" not in st.session_state:
     st.session_state.filter_sort = DEFAULT_SORT_OPTION if not df.empty else "Degişlilik"
-# keep sidebar radius widget state separate from map state
 if "filter_radius_input" not in st.session_state:
     st.session_state.filter_radius_input = float(st.session_state.circle_radius_km)
 
@@ -260,86 +298,157 @@ def reset_filter_state(price_limit: float) -> None:
 
 # Namespaced widget keys so tabs never collide
 def event_card(row, key_prefix: str):
-    cols = st.columns([1, 3, 2])
-    with cols[0]:
-        st.markdown("### 🎫")
-        st.caption(row["category"])
-        st.caption(row["city"])
-    with cols[1]:
-        st.markdown(f"**{row['title']}**")
-        st.caption(f"{row['venue']} • {row['date_start'].strftime('%a, %d %b %H:%M')} — {row['date_end'].strftime('%H:%M')}")
-        st.write(row["description"])
-        st.caption(f"Meşhurlygy: {row['popularity']} • Bahasy: {row['price']} TMT")
-        distance = row.get("distance_km") if hasattr(row, "get") else None
-        if distance is not None and not pd.isna(distance):
-            st.caption(f"Aralygy: {distance:.1f} km")
-    with cols[2]:
-        saved = row["id"] in st.session_state.saved_ids
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            if st.button("📄 Jikme-jik", key=f"{key_prefix}_details_{row['id']}"):
-                st.session_state.details_id = row["id"]
-        with c2:
-            btn_label = "❤️ Saýlandy" if saved else "🤍 Saýla"
-            if st.button(btn_label, key=f"{key_prefix}_save_{row['id']}"):
-                if saved:
-                    st.session_state.saved_ids.remove(row["id"])
-                    st.toast(f"'{row['title']}' saýlananlardan aýyryldy", icon="💔")
-                else:
-                    st.session_state.saved_ids.add(row["id"])
-                    st.toast(f"'{row['title']}' saýlananlara goşuldy!", icon="❤️")
-                st.rerun()
-        with c3:
-            if st.button("📤 Paýlaş", key=f"{key_prefix}_share_{row['id']}"):
-                st.toast("Paýlaşmak funksiýasy ýakynda elýeterli bolar!", icon="🔗")
-
-
-def details_panel(df: pd.DataFrame, event_id: str):
-    row = df[df["id"] == event_id]
-    if row.empty:
-        return
-    row = row.iloc[0]
+    # Use container with border for better visual separation
     with st.container(border=True):
-        st.markdown(f"### {row['title']}")
-        st.caption(f"{row['category']} • {row['city']} • {row['venue']}")
-        st.write(row["description"])
-        st.write(f"**Wagty:** {row['date_start'].strftime('%Y-%m-%d %H:%M')} — {row['date_end'].strftime('%H:%M')}")
-        st.write(f"**Bahasy:** {row['price']} TMT")
-        st.write(f"**Meşhurlygy:** {row['popularity']}")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            if st.button("🎫 Biletler", key=f"tickets_{row['id']}"):
-                st.info("Bilet satyn almak funksiýasy ýakynda elýeterli bolar!", icon="🎫")
-        with c2:
-            if st.button("🗺️ Ýol görkezme", key=f"dir_{row['id']}"):
+        cols = st.columns([1, 4, 2])
+        with cols[0]:
+            st.markdown("### 🎫")
+            # Category badge with color
+            category = row['category']
+            color = CATEGORY_COLORS.get(category, CATEGORY_COLORS['default'])
+            st.markdown(
+                f'<span style="background-color: {color}; color: white; padding: 4px 12px; '
+                f'border-radius: 12px; font-size: 0.75rem; font-weight: 600; '
+                f'display: inline-block; margin: 4px 0;">{category}</span>',
+                unsafe_allow_html=True
+            )
+            st.caption(f"📍 {row['city']}")
+        with cols[1]:
+            # Improved title hierarchy
+            st.markdown(f"### {row['title']}")
+            st.caption(f"📍 {row['venue']} • 🕒 {row['date_start'].strftime('%a, %d %b %H:%M')} — {row['date_end'].strftime('%H:%M')}")
+            st.write(row["description"][:200] + "..." if len(row["description"]) > 200 else row["description"])
+            # Better formatted metadata with visual styling
+            col_a, col_b = st.columns(2)
+            with col_a:
+                st.caption(f"⭐ Meşhurlygy: {row['popularity']}")
+            with col_b:
+                # Styled price display
+                price = row['price']
+                if price == 0:
+                    st.markdown('💰 Bahasy: <span style="color: #10b981; font-weight: 700;">MUGT</span>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'💰 Bahasy: <span style="color: #f59e0b; font-weight: 700;">{price} TMT</span>', unsafe_allow_html=True)
+            distance = row.get("distance_km") if hasattr(row, "get") else None
+            if distance is not None and not pd.isna(distance):
+                st.caption(f"📏 Aralygy: {distance:.1f} km")
+        with cols[2]:
+            saved = row["id"] in st.session_state.saved_ids
+            # Fix: Use wider first column for Details button to prevent wrapping
+            c1, c2 = st.columns([1.5, 1])
+            with c1:
+                if st.button("📄 Jikme-jik", key=f"{key_prefix}_details_{row['id']}", use_container_width=True):
+                    show_event_details(row)
+            with c2:
+                btn_label = "❤️" if saved else "🤍"
+                if st.button(btn_label, key=f"{key_prefix}_save_{row['id']}", use_container_width=True):
+                    if saved:
+                        st.session_state.saved_ids.remove(row["id"])
+                        st.toast(f"'{row['title']}' saýlananlardan aýyryldy", icon="💔")
+                    else:
+                        st.session_state.saved_ids.add(row["id"])
+                        st.toast(f"'{row['title']}' saýlananlara goşuldy!", icon="❤️")
+                    st.rerun()
+            # Share button on new row to prevent cramping
+            if st.button("📤 Paýlaş", key=f"{key_prefix}_share_{row['id']}", use_container_width=True):
+                # Create shareable Google Maps link
                 lat, lon = row.get("lat"), row.get("lon")
                 if pd.notna(lat) and pd.notna(lon):
-                    maps_url = f"https://www.google.com/maps/dir/?api=1&destination={lat},{lon}"
-                    st.markdown(f"[Google Maps-da açyň]({maps_url})")
+                    share_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lon}"
+                    st.toast(f"🔗 Link kopylandy! {share_url}", icon="✅")
+                    # Show the link in a text area for easy copying
+                    st.markdown(
+                        f'<div style="margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 4px; '
+                        f'font-size: 0.75rem; word-break: break-all;">'
+                        f'<a href="{share_url}" target="_blank" style="color: #6366f1;">{share_url}</a>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
                 else:
-                    st.warning("Koordinatalar elýeterli däl", icon="⚠️")
-        with c3:
-            if st.button("❌ Ýap", key="close_details"):
-                st.session_state.details_id = None
-                st.rerun()
+                    st.toast("Koordinatalar ýok, paýlaşyp bolmady", icon="⚠️")
+
+
+@st.dialog("Çäre barada jikme-jik maglumat")
+def show_event_details(row):
+    """Modern modal dialog for event details using @st.dialog decorator."""
+    # Category badge
+    category = row['category']
+    color = CATEGORY_COLORS.get(category, CATEGORY_COLORS['default'])
+    st.markdown(
+        f'<span style="background-color: {color}; color: white; padding: 6px 16px; '
+        f'border-radius: 16px; font-size: 0.875rem; font-weight: 700; '
+        f'display: inline-block; margin-bottom: 1rem;">{category}</span>',
+        unsafe_allow_html=True
+    )
+    
+    st.markdown(f"# {row['title']}")
+    st.caption(f"📍 {row['city']} • {row['venue']}")
+    st.divider()
+    
+    # Event details in organized sections
+    st.markdown("### 📝 Düşündiriş")
+    st.write(row["description"])
+    
+    st.markdown("### ⏰ Wagt we ýer")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write(f"**Başlangyç:** {row['date_start'].strftime('%Y-%m-%d %H:%M')}")
+        st.write(f"**Soňy:** {row['date_end'].strftime('%Y-%m-%d %H:%M')}")
+    with col2:
+        st.write(f"**Ýer:** {row['venue']}")
+        st.write(f"**Şäher:** {row['city']}")
+    
+    st.markdown("### 💰 Baha we meşhurlygy")
+    col1, col2 = st.columns(2)
+    with col1:
+        price = row['price']
+        if price == 0:
+            st.markdown('<p style="font-size: 1.5rem; color: #10b981; font-weight: 700;">MUGT</p>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<p style="font-size: 1.5rem; color: #f59e0b; font-weight: 700;">{price} TMT</p>', unsafe_allow_html=True)
+    with col2:
+        st.write(f"**Meşhurlygy:** ⭐ {row['popularity']}")
+    
+    st.divider()
+    
+    # Action buttons
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🎫 Biletler satyn al", use_container_width=True, type="primary"):
+            st.info("Bilet satyn almak funksiýasy ýakynda elýeterli bolar!", icon="🎫")
+    with col2:
+        lat, lon = row.get("lat"), row.get("lon")
+        if pd.notna(lat) and pd.notna(lon):
+            maps_url = f"https://www.google.com/maps/dir/?api=1&destination={lat},{lon}"
+            st.link_button("🗺️ Ýol görkezme", maps_url, use_container_width=True)
 
 
 # ---------- Sidebar ----------
 with st.sidebar:
     st.markdown("## Süzgüçler")
-    city_options = [ALL_CITY_OPTION] + (sorted(df["city"].unique().tolist()) if not df.empty else [])
-    if st.session_state.filter_city not in city_options:
-        st.session_state.filter_city = ALL_CITY_OPTION
-    city = st.selectbox("Şäher", options=city_options, key="filter_city")
-
-    date_options = ["Şu gün", "Ertir", "Şu hepdäniň ahyry", "7 günüň içinde", DEFAULT_DATE_PRESET]
-    date_preset = st.radio("Sene", options=date_options, index=date_options.index(DEFAULT_DATE_PRESET), key="filter_date")
-
+    
+    # Move search to top for better UX
+    search = st.text_input("🔍 Gözleg", placeholder="Ady, ýeri ýa-da düşündiriş...", key="filter_search")
+    
+    st.markdown("---")
+    
+    # Group filters logically
     category_options = sorted(df["category"].unique().tolist()) if not df.empty else []
     if st.session_state.filter_categories:
         st.session_state.filter_categories = [c for c in st.session_state.filter_categories if c in category_options]
     categories = st.multiselect("Görnüşi", options=category_options, key="filter_categories")
-
+    
+    st.markdown("")
+    date_options = ["Şu gün", "Ertir", "Şu hepdäniň ahyry", "7 günüň içinde", DEFAULT_DATE_PRESET]
+    date_preset = st.radio("Sene", options=date_options, index=date_options.index(st.session_state.filter_date), key="filter_date")
+    
+    st.markdown("")
+    city_options = [ALL_CITY_OPTION] + (sorted(df["city"].unique().tolist()) if not df.empty else [])
+    if st.session_state.filter_city not in city_options:
+        st.session_state.filter_city = ALL_CITY_OPTION
+    city = st.selectbox("Şäher", options=city_options, key="filter_city")
+    
+    st.markdown("")
     if st.session_state.filter_price > price_ceiling:
         st.session_state.filter_price = price_ceiling
     if st.session_state.filter_price < 0:
@@ -352,8 +461,6 @@ with st.sidebar:
         step=price_step,
         key="filter_price",
     )
-
-    search = st.text_input("Gözleg", placeholder="Ady, ýeri ýa-da düşündiriş...", key="filter_search")
 
     sort_options = ["Degişlilik", DEFAULT_SORT_OPTION, "Baha (arzan → gymmat)", "Meşhurlygy"]
     if st.session_state.filter_sort not in sort_options:
@@ -402,166 +509,13 @@ with st.sidebar:
 # ---------- Tabs ----------
 tabs = st.tabs(["📋 Sanaw", "🗺️ Karta", "⭐ Saýlananlar"])
 
-# Optional details header
-if st.session_state.details_id:
-    details_panel(df, st.session_state.details_id)
-    st.divider()
-
+# Apply filters
 base_filtered = apply_filters(df, city, categories, search, price_max, date_preset)
 
 with tabs[1]:
-    st.subheader("Karta — tegelek zony ")
-    # Build Leaflet map
-    center_lat, center_lon = st.session_state.circle_center
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=12, control_scale=True)
-
-    # Apply circle filter to the map view so pins match radius selection
-    filtered_for_map = filter_by_circle(base_filtered, center_lat, center_lon, st.session_state.circle_radius_km)
-
-    # If no events satisfy filters, keep map but notify user
-    if filtered_for_map.empty:
-        st.info("Saýlanan radius/filtr boýunça kartada görkezmäge ýolbaşylar ýok.")
-
-    # Pre-add our circle so user can edit/drag it
-    if radius_km_number > 0:
-        folium.Circle(
-            location=[center_lat, center_lon],
-            radius=float(radius_km_number) * 1000.0,  # km → m
-            color="#003366",
-            weight=2,
-            fill=True,
-            fill_opacity=0.15,
-            tooltip="Radius zona (sürükläp ýerini üýtgedip bilersiňiz)",
-    ).add_to(m)
-
-    # Add event markers (already radius-filtered for the map view)
-    marker_coords = []
-    for _, r in filtered_for_map.iterrows():
-        if pd.isna(r["lat"]) or pd.isna(r["lon"]):
-            continue
-        start_label = r["date_start"].strftime("%Y-%m-%d %H:%M")
-        popup = folium.Popup(
-            "<br/>".join(
-                [
-                    f"<b>{r['title']}</b>",
-                    r["venue"],
-                    f"Wagty: {start_label}",
-                    f"Bahasy: {r['price']} TMT",
-                ]
-            ),
-            max_width=300,
-        )
-        # Use colored icon based on category
-        icon_color = "red"
-        if r["category"] in ["Music", "Art"]:
-            icon_color = "purple"
-        elif r["category"] in ["Sports", "Wellness"]:
-            icon_color = "green"
-        elif r["category"] in ["Tech", "Business"]:
-            icon_color = "blue"
-        elif r["category"] in ["Food", "Market"]:
-            icon_color = "orange"
-        
-        folium.Marker(
-            location=[float(r["lat"]), float(r["lon"])],
-            tooltip=r["title"],
-            popup=popup,
-            icon=folium.Icon(color=icon_color, icon="calendar", prefix="fa")
-        ).add_to(m)
-        marker_coords.append([float(r["lat"]), float(r["lon"])])
-
-    if marker_coords:
-        # Fit to visible markers so users see the relevant area immediately
-        m.fit_bounds(marker_coords, padding=(20, 20))
-
-    # Add Draw control (user can draw/edit/move the circle)
-    Draw(
-        draw_options={
-            "polyline": False,
-            "polygon": False,
-            "rectangle": False,
-            "circle": True,
-            "marker": False,
-            "circlemarker": False,
-        },
-        edit_options={
-            "edit": True,
-            "remove": True
-        },
-    ).add_to(m)
-
-    out = st_folium(
-        m,
-        height=520,
-        use_container_width=True,
-        returned_objects=["last_active_drawing", "all_drawings"],
-        key="events-map",
-    )
-
-    # Read back the circle the user edited/drew (draggable via Draw→Edit)
-    new_center = None
-    new_radius_km = None
-    need_rerun = False
-
-    # Prefer the last active drawing if available
-    feature = (out or {}).get("last_active_drawing")
-    drawings = (out or {}).get("all_drawings", [])
-    if not feature and drawings:
-        # Or fall back to the latest drawing (if any)
-        feature = drawings[-1]
+    st.subheader("🗺️ Karta — Tegelek zony")
     
-    # Track if we've had drawings before
-    if drawings:
-        st.session_state.had_map_drawings = True
-    
-    # If user explicitly removed everything (and we had drawings before), clear radius filter
-    if not drawings and feature is None and st.session_state.had_map_drawings:
-        new_radius_km = 0.0
-        st.session_state.had_map_drawings = False
-
-    if feature and isinstance(feature, dict):
-        geom = feature.get("geometry", {})
-        props = feature.get("properties", {})
-        # Leaflet Draw encodes a circle as type 'Point' with radius in properties (meters)
-        # Sometimes it may send as Polygon approximation; handle both.
-        if geom.get("type") == "Point" and "radius" in props:
-            lat = geom["coordinates"][1]
-            lon = geom["coordinates"][0]
-            rad_m = float(props["radius"])
-            new_center = (lat, lon)
-            new_radius_km = rad_m / 1000.0
-        elif geom.get("type") == "Polygon":
-            # Approximate center from first coordinate ring
-            ring = geom.get("coordinates", [[]])[0]
-            if ring:
-                # simple centroid of vertices
-                lats = [pt[1] for pt in ring]
-                lons = [pt[0] for pt in ring]
-                lat = sum(lats) / len(lats)
-                lon = sum(lons) / len(lons)
-                new_center = (lat, lon)
-                # radius rough guess from first point
-                lat0, lon0 = lats[0], lons[0]
-                new_radius_km = haversine_km(lat, lon, lat0, lon0)
-
-    # Update session state from map
-    if new_center:
-        st.session_state.circle_center = new_center
-        need_rerun = True
-    if new_radius_km is not None:
-        updated_radius = float(new_radius_km)
-        if not math.isclose(updated_radius, st.session_state.circle_radius_km, rel_tol=1e-9, abs_tol=1e-4):
-            st.session_state.circle_radius_km = updated_radius
-            st.session_state.filter_radius_input = updated_radius
-            need_rerun = True
-    
-    # Trigger rerun if map changed state (so sidebar and list update)
-    if need_rerun:
-        st.rerun()
-
-    # Show current circle info
-    st.caption(f"Merkez: {st.session_state.circle_center[0]:.4f}, {st.session_state.circle_center[1]:.4f} • "
-               f"Aralyk: {st.session_state.circle_radius_km:.1f} km")
+    # Show loading message while map initializes
 
 # Now apply circle filter after map interactions (for list view)
 filtered = filter_by_circle(
@@ -584,7 +538,7 @@ with tabs[0]:
 with tabs[2]:
     st.subheader("Halanan çäreler")
     if not st.session_state.saved_ids:
-        st.info("Häzirlikçe halananlar ýok. Islendik kartda **Halanlara gos** düwmesine basyp goşuň.")
+        st.info("Häzirlikçe halananlar ýok. Islendik kartda **Halanlara goş** düwmesine basyp goşuň.")
     else:
         fav_df = df[df["id"].isin(st.session_state.saved_ids)]
         fav_df = apply_sort(fav_df, sort_by)
