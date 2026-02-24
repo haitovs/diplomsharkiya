@@ -1,5 +1,6 @@
 import streamlit as st
 from state_manager import get_state
+from components.styles import inject_custom_css, render_hero, render_section_header, render_event_card_html, get_category_color_hex
 import pathlib
 
 # Page Config
@@ -10,16 +11,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inject Custom Styles
+inject_custom_css()
+
 # Initialize State
 state = get_state()
 
-# Landing Page Content
-st.markdown("""
-<div style="background: linear-gradient(135deg, #6366F1 0%, #10B981 100%); padding: 3rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; color: white;">
-    <h1 style="color: white !important; margin-bottom: 0.5rem;">🎟️ Sharkiya Event Discovery</h1>
-    <h3 style="color: rgba(255,255,255,0.9) !important; font-weight: 400;">Your Gateway to Local Events in Turkmenistan</h3>
-</div>
-""", unsafe_allow_html=True)
+# Hero Banner
+render_hero(
+    title="Sharkiya Event Discovery",
+    subtitle="Your Gateway to Local Events in Turkmenistan",
+    icon="🎟️"
+)
 
 from utils.data_loader import load_data
 df = load_data()
@@ -36,44 +39,62 @@ with c3:
 st.divider()
 
 # Navigation Cards
+render_section_header("🧭 Quick Navigation", "Jump to any section")
+
 col1, col2, col3 = st.columns(3)
 with col1:
     with st.container(border=True):
-        st.subheader("📋 Browse")
-        st.write("Find concerts, workshops, and more.")
-        if st.button("Go to Events", use_container_width=True):
+        st.markdown("### 📋 Browse Events")
+        st.markdown("Find concerts, workshops, and more in your city.")
+        if st.button("Go to Events →", use_container_width=True, type="primary"):
             st.switch_page("pages/1_📋_Events.py")
 
 with col2:
     with st.container(border=True):
-        st.subheader("🗺️ Map")
-        st.write("Explore events near you interactively.")
-        if st.button("Open Map", use_container_width=True):
+        st.markdown("### 🗺️ Interactive Map")
+        st.markdown("Explore events near you on an interactive map.")
+        if st.button("Open Map →", use_container_width=True, type="primary"):
             st.switch_page("pages/2_🗺️_Map.py")
 
 with col3:
     with st.container(border=True):
-        st.subheader("⭐ Saved")
-        st.write("Manage your interested events.")
-        if st.button("View Saved", use_container_width=True):
+        st.markdown("### ⭐ Saved Events")
+        st.markdown("Manage your bookmarked events.")
+        if st.button("View Saved →", use_container_width=True, type="primary"):
             st.switch_page("pages/3_⭐_Saved_Events.py")
 
-# Featured Section
-st.markdown("### 🔥 Featured Events")
+st.divider()
+
+# Featured Events — HTML cards
+render_section_header("🔥 Featured Events", "Most popular events right now")
+
 if not df.empty:
-    featured = df.sort_values("popularity", ascending=False).head(3)
+    from config import CATEGORY_CONFIG
+    featured = df.sort_values("popularity", ascending=False).head(5)
     for _, row in featured.iterrows():
-        with st.container(border=True):
-            fc1, fc2 = st.columns([1, 4])
-            with fc1:
-                 # Category Icon
-                custom_icon = row.get('icon')
-                if custom_icon and (pathlib.Path("assets/icons") / f"{custom_icon}.png").exists():
-                    st.image(str(pathlib.Path("assets/icons") / f"{custom_icon}.png"), width=40)
-                else:
-                    st.markdown("## ⭐")
-            with fc2:
-                st.markdown(f"**{row['title']}** — {row['city']}")
-                st.caption(row.get('description', '')[:100] + "...")
+        cat = row.get("category", "Event")
+        cat_cfg = CATEGORY_CONFIG.get(cat, {})
+        cat_icon = cat_cfg.get("icon", "📌")
+        cat_color = get_category_color_hex(cat)
+
+        date_str = ""
+        start = row.get("date_start")
+        if start:
+            try:
+                date_str = start.strftime("%b %d, %Y · %I:%M %p")
+            except Exception:
+                date_str = str(start)
+
+        st.markdown(render_event_card_html(
+            title=row.get("title", "Untitled"),
+            venue=row.get("venue", "TBA"),
+            city=row.get("city", "Unknown"),
+            date_str=date_str,
+            price=row.get("price", 0),
+            category=cat,
+            cat_icon=cat_icon,
+            cat_color=cat_color,
+            description=row.get("description", ""),
+        ), unsafe_allow_html=True)
 else:
     st.info("No events to display.")

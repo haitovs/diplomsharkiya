@@ -14,6 +14,9 @@ st.set_page_config(
     layout="wide"
 )
 
+from components.styles import inject_custom_css
+inject_custom_css()
+
 # ============ Config ============
 DATA_PATH = pathlib.Path(__file__).parent.parent.parent / "data" / "events.json"
 ADMIN_PASSWORD = "admin123"

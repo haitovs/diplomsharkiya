@@ -1,26 +1,57 @@
 import streamlit as st
+from components.styles import inject_custom_css, render_hero
 
 st.set_page_config(page_title="About | Sharkiya", page_icon="ℹ️")
 
-st.title("ℹ️ About Sharkiya Event Discovery")
+inject_custom_css()
+
+render_hero(
+    title="About Sharkiya",
+    subtitle="Your premier platform for local events in Turkmenistan",
+    icon="ℹ️"
+)
 
 st.markdown("""
-### Welcome!
-Sharkiya Event Discovery is your premier platform for finding local events in Turkmenistan.
+### 🎯 What is Sharkiya?
 
-### Features
-- **📋 Events List**: Browse upcoming concerts, workshops, and gatherings.
-- **🗺️ Interactive Map**: Visualize events geographically to find what's near you.
-- **⭐ Saved Events**: Bookmark your favorite events (data is saved in your session).
+Sharkiya Event Discovery is a modern platform that connects people with local events
+across Turkmenistan. From concerts and tech meetups to food festivals and art exhibitions
+— discover what's happening in your city.
 
-### How to Use
-1.  **Filter**: Use the sidebar to filter by City, Category, or Price.
-2.  **Search**: Type keywords to find specific events.
-3.  **Save**: Click the heart icon to save an event for later.
+### ✨ Key Features
+""")
 
-### For Organizers
-Currently, this platform is in beta. Contact us to list your events!
+col1, col2, col3 = st.columns(3)
+with col1:
+    with st.container(border=True):
+        st.markdown("### 📋 Smart Browsing")
+        st.markdown("Filter events by city, category, date, and price. Full-text search included.")
+with col2:
+    with st.container(border=True):
+        st.markdown("### 🗺️ Interactive Map")
+        st.markdown("Explore events geographically with rich popups showing all event details.")
+with col3:
+    with st.container(border=True):
+        st.markdown("### ⭐ Save & Plan")
+        st.markdown("Bookmark your favorite events to build your personal event calendar.")
+
+st.markdown("""
+### 🏙️ Cities Covered
+
+| City | Region | Status |
+|------|--------|--------|
+| Ashgabat | Ahal | ✅ Active |
+| Mary | Mary | ✅ Active |
+| Türkmenabat | Lebap | ✅ Active |
+| Dashoguz | Dashoguz | ✅ Active |
+| Balkanabat | Balkan | ✅ Active |
+| Awaza | Turkmenbashi | ✅ Active |
+
+### 📬 For Event Organizers
+
+Want to list your event on Sharkiya? Contact our admin team through the admin panel
+to add your events to the platform.
 
 ---
-*Version 5.0 (Upgrade) • Built with Streamlit*
+*Version 5.0 • Built with Streamlit • Sharkiya Event Discovery*
 """)
