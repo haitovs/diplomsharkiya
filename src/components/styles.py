@@ -168,6 +168,19 @@ def inject_custom_css():
         padding-bottom: 3rem;
     }
 
+    /* ── Equal height metric cards ─────────────── */
+    [data-testid="column"] [data-testid="stMetric"] {
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* pull save-button row tighter to the card above */
+    [data-testid="column"] .stButton {
+        margin-top: -0.75rem;
+    }
+
     /* ── Smooth scrolling ──────────────────────── */
     html {
         scroll-behavior: smooth;

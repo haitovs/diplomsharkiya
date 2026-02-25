@@ -58,7 +58,13 @@ else:
 
     import os
 
-    m = folium.Map(location=center, zoom_start=zoom, tiles="cartodbpositron")
+    # Use OpenStreetMap tiles (most reliable)
+    m = folium.Map(
+        location=center,
+        zoom_start=zoom,
+        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    )
 
     for _, row in filtered_df.iterrows():
         if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
@@ -67,15 +73,8 @@ else:
             cat_icon = cat_cfg.get("icon", "📌")
             cat_color = get_category_color_hex(cat)
 
-            custom_icon = row.get("icon")
-            icon_obj = None
-            if custom_icon and os.path.exists(f"assets/icons/{custom_icon}.png"):
-                icon_obj = folium.CustomIcon(
-                    icon_image=f"assets/icons/{custom_icon}.png",
-                    icon_size=(30, 30),
-                )
-            else:
-                icon_obj = folium.Icon(color="blue", icon="info-sign")
+            # Use folium's built-in colored icons
+            icon_obj = folium.Icon(color="blue", icon="info-sign")
 
             # Styled popup
             price = row.get("price", 0)
@@ -124,4 +123,8 @@ else:
                 icon=icon_obj,
             ).add_to(m)
 
-    st_folium(m, width="100%", height=600)
+    try:
+        st_folium(m, width="100%", height=600)
+    except Exception as e:
+        st.error(f"Map rendering error: {e}")
+        st.info("Try refreshing the page.")

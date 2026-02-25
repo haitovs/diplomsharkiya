@@ -113,14 +113,15 @@ else:
             description=row.get("description", ""),
         ), unsafe_allow_html=True)
 
-        # Save button
-        col_spacer, col_save = st.columns([5, 1])
-        with col_save:
-            is_saved = state.ui.is_saved(row.get("id"))
+        # Save button — tight to card, right-aligned
+        is_saved = state.ui.is_saved(row.get("id"))
+        col_l, col_r = st.columns([10, 1])
+        with col_r:
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{row.get('id')}",
-                help=t("save")
+                help=t("save"),
+                use_container_width=True,
             ):
                 state.ui.toggle_save(row.get("id"))
                 st.rerun()
