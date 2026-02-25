@@ -1,4 +1,4 @@
-# Configuration for Sharkiya Event Discovery
+# Configuration for Event Discovery
 # Core and UI Settings
 
 from dataclasses import dataclass
@@ -10,7 +10,7 @@ class CoreConfig:
     
     # App Info
     APP_TITLE = "Local Events"
-    APP_SUBTITLE = "Sharkiya Event Discovery"
+    APP_SUBTITLE = "Event Discovery"
     APP_ICON = "🎟️"
     VERSION = "4.2"
     

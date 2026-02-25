@@ -5,7 +5,7 @@ import pathlib
 
 # Page Config
 st.set_page_config(
-    page_title="Sharkiya Event Discovery",
+    page_title="Event Discovery",
     page_icon="🎟️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -19,7 +19,7 @@ state = get_state()
 
 # Hero Banner
 render_hero(
-    title="Sharkiya Event Discovery",
+    title="Event Discovery",
     subtitle="Your Gateway to Local Events in Turkmenistan",
     icon="🎟️"
 )

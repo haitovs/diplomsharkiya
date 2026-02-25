@@ -1,5 +1,5 @@
 """
-Sharkiya Event Discovery - UI Components
+Event Discovery - UI Components
 Reusable UI components for event cards, filters, etc.
 """
 

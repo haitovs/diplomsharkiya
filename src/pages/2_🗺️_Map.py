@@ -8,7 +8,7 @@ from state_manager import get_state
 from components.styles import inject_custom_css, get_category_color_hex
 from config import CATEGORY_CONFIG
 
-st.set_page_config(page_title="Map | Sharkiya", page_icon="🗺️", layout="wide")
+st.set_page_config(page_title="Map | Event Discovery", page_icon="🗺️", layout="wide")
 
 inject_custom_css()
 

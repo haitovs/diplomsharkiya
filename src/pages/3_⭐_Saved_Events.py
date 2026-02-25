@@ -7,7 +7,7 @@ from components.styles import (
 )
 from config import CATEGORY_CONFIG
 
-st.set_page_config(page_title="Saved | Sharkiya", page_icon="⭐", layout="wide")
+st.set_page_config(page_title="Saved | Event Discovery", page_icon="⭐", layout="wide")
 
 inject_custom_css()
 

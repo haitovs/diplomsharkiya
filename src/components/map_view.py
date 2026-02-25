@@ -1,5 +1,5 @@
 """
-Sharkiya Event Discovery - Map Component
+Event Discovery - Map Component
 Interactive map with event markers and filtering
 """
 

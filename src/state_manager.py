@@ -1,5 +1,5 @@
 """
-State Management Module for Sharkiya Event Discovery
+State Management Module for Event Discovery
 Senior Developer Best Practices Implementation
 """
 

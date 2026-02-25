@@ -1,20 +1,20 @@
 import streamlit as st
 from components.styles import inject_custom_css, render_hero
 
-st.set_page_config(page_title="About | Sharkiya", page_icon="ℹ️")
+st.set_page_config(page_title="About | Event Discovery", page_icon="ℹ️")
 
 inject_custom_css()
 
 render_hero(
-    title="About Sharkiya",
+    title="About Event Discovery",
     subtitle="Your premier platform for local events in Turkmenistan",
     icon="ℹ️"
 )
 
 st.markdown("""
-### 🎯 What is Sharkiya?
+### 🎯 What is Event Discovery?
 
-Sharkiya Event Discovery is a modern platform that connects people with local events
+Event Discovery is a modern platform that connects people with local events
 across Turkmenistan. From concerts and tech meetups to food festivals and art exhibitions
 — discover what's happening in your city.
 
@@ -49,9 +49,9 @@ st.markdown("""
 
 ### 📬 For Event Organizers
 
-Want to list your event on Sharkiya? Contact our admin team through the admin panel
+Want to list your event on Event Discovery? Contact our admin team through the admin panel
 to add your events to the platform.
 
 ---
-*Version 5.0 • Built with Streamlit • Sharkiya Event Discovery*
+*Version 5.0 • Built with Streamlit • Event Discovery*
 """)

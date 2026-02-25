@@ -1,4 +1,4 @@
-# 🔧 Admin Panel - Sharkiya Event Discovery
+# 🔧 Admin Panel - Event Discovery
 # Completely separate from user app
 
 import streamlit as st

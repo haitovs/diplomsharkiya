@@ -10,7 +10,7 @@ from components.styles import (
 from config import CATEGORY_CONFIG
 
 # Page Config
-st.set_page_config(page_title="Events | Sharkiya", page_icon="📋", layout="wide")
+st.set_page_config(page_title="Events | Event Discovery", page_icon="📋", layout="wide")
 
 inject_custom_css()
 

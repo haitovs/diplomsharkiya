@@ -1,12 +1,12 @@
 """
-Sharkiya Event Discovery — Custom Styles
+Event Discovery — Custom Styles
 Centralized CSS injection for premium Streamlit UI.
 """
 
 import streamlit as st
 
 def inject_custom_css():
-    """Inject custom CSS to override Streamlit defaults with the Sharkiya design system."""
+    """Inject custom CSS to override Streamlit defaults with the Event Discovery design system."""
     st.markdown("""
     <style>
     /* ── Google Font ────────────────────────────── */
@@ -27,7 +27,7 @@ def inject_custom_css():
     }
 
     [data-testid="stSidebar"]::before {
-        content: "🎟️ Sharkiya";
+        content: "🎟️ EventHub";
         display: block;
         padding: 1.5rem 1rem 0.5rem;
         font-size: 1.5rem;

@@ -1,5 +1,5 @@
 """
-Sharkiya Event Discovery - Components Package
+Event Discovery - Components Package
 """
 
 from .ui_components import (
