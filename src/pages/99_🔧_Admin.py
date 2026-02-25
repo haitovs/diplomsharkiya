@@ -15,7 +15,9 @@ st.set_page_config(
 )
 
 from components.styles import inject_custom_css
+from utils.i18n import t, render_language_selector
 inject_custom_css()
+render_language_selector()
 
 # ============ Config ============
 DATA_PATH = pathlib.Path(__file__).parent.parent.parent / "data" / "events.json"
@@ -41,12 +43,12 @@ def check_auth():
     if st.session_state.admin_auth:
         return True
     
-    st.markdown("# 🔐 Admin Login")
+    st.markdown(f"# 🔐 {t('admin_login')}")
     
     with st.form("login"):
         username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submit = st.form_submit_button("Login", use_container_width=True)
+        password = st.text_input(t("password"), type="password")
+        submit = st.form_submit_button(t("login"), use_container_width=True)
         
         if submit:
             if username == "admin" and password == ADMIN_PASSWORD:
@@ -101,11 +103,11 @@ df = pd.DataFrame(events) if events else pd.DataFrame()
 # Header
 col1, col2, col3 = st.columns([2, 1, 1])
 with col1:
-    st.markdown("# 🔧 Admin Panel")
+    st.markdown(f"# 🔧 {t('admin_title')}")
 with col2:
     st.caption(f"👤 Logged in as: **{st.session_state.get('admin_user', 'admin')}**")
 with col3:
-    if st.button("🚪 Logout", use_container_width=True):
+    if st.button(f"🚪 {t('logout')}", use_container_width=True):
         st.session_state.admin_auth = False
         st.rerun()
 
@@ -296,9 +298,9 @@ with tabs[2]:
             
         icon_choice = st.selectbox("Select Icon", available_icons)
         
-        description = st.text_area("Description", placeholder="Event description...")
+        description = st.text_area(t("event_description"), placeholder="Event description...")
         
-        submit = st.form_submit_button("➕ Add Event", use_container_width=True, type="primary")
+        submit = st.form_submit_button(f"➕ {t('add_event')}", use_container_width=True, type="primary")
         
         if submit:
             if not title or not venue:
@@ -329,6 +331,50 @@ with tabs[2]:
                 save_events(events)
                 st.success(f"✅ Event '{title}' added successfully!")
                 st.balloons()
+
+    # ─── Image Upload (outside form) ─────────────────────────
+    st.divider()
+    st.markdown(f"### 🖼️ {t('upload_image')}")
+    st.caption("Upload images for events. They will be saved in data/images/ and linked to the selected event.")
+
+    if events:
+        event_titles = {e["id"]: e.get("title", "Untitled") for e in events}
+        selected_event_id = st.selectbox(
+            "Select event to add image",
+            options=list(event_titles.keys()),
+            format_func=lambda x: event_titles[x],
+            key="img_event_select"
+        )
+
+        uploaded_img = st.file_uploader(
+            t("upload_image"),
+            type=["jpg", "jpeg", "png", "webp"],
+            key="event_img_upload"
+        )
+
+        if uploaded_img and selected_event_id:
+            if st.button(f"💾 {t('save')}", key="save_img", type="primary"):
+                img_dir = pathlib.Path(__file__).parent.parent.parent / "data" / "images"
+                img_dir.mkdir(parents=True, exist_ok=True)
+
+                ext = uploaded_img.name.split(".")[-1]
+                img_filename = f"{selected_event_id}.{ext}"
+                img_path = img_dir / img_filename
+
+                with open(img_path, "wb") as f:
+                    f.write(uploaded_img.getbuffer())
+
+                # Update event in the list
+                for e in events:
+                    if e["id"] == selected_event_id:
+                        e["image"] = f"images/{img_filename}"
+                        break
+
+                save_events(events)
+                st.success(f"✅ Image saved for event: {event_titles[selected_event_id]}")
+                st.image(str(img_path), width=300)
+    else:
+        st.info(t("no_events"))
 
 # ============ Tab 4: Import/Export ============
 with tabs[3]:

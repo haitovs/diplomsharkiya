@@ -4,6 +4,7 @@ import folium
 from streamlit_folium import st_folium
 from utils.data_loader import load_data
 from utils.filters import apply_filters
+from utils.i18n import t, render_language_selector
 from state_manager import get_state
 from components.styles import inject_custom_css, get_category_color_hex
 from config import CATEGORY_CONFIG
@@ -11,35 +12,41 @@ from config import CATEGORY_CONFIG
 st.set_page_config(page_title="Map | Event Discovery", page_icon="🗺️", layout="wide")
 
 inject_custom_css()
+render_language_selector()
 
 df = load_data()
 state = get_state()
 
-st.title("🗺️ Interactive Map")
+st.title(f"🗺️ {t('map_page_title')}")
 
 # --- SIDEBAR FILTERS (Compact) ---
 with st.sidebar:
-    st.header("🔍 Filter Map")
-    city_options = ["All Cities"] + sorted(df["city"].unique().tolist())
+    st.header(f"🔍 {t('filter_by_city')}")
+    city_options = [t("all_cities")] + sorted(df["city"].unique().tolist())
+    current_city = state.filters.city
+    if current_city == "All Cities":
+        current_city = t("all_cities")
     state.filters.city = st.selectbox(
-        "City",
+        t("event_city"),
         city_options,
-        index=city_options.index(state.filters.city)
-        if state.filters.city in city_options else 0
+        index=city_options.index(current_city)
+        if current_city in city_options else 0
     )
+    if state.filters.city == t("all_cities"):
+        state.filters.city = "All Cities"
 
     cat_options = sorted(df["category"].unique().tolist())
     state.filters.categories = st.multiselect(
-        "Categories", cat_options, default=state.filters.categories
+        t("filter_by_category"), cat_options, default=state.filters.categories
     )
 
 # --- APPLY FILTERS ---
 filtered_df = apply_filters(df, state.filters)
 
 if filtered_df.empty:
-    st.warning("No events found to display on map.")
+    st.warning(t("no_events"))
 else:
-    st.caption(f"Showing {len(filtered_df)} events on map")
+    st.caption(f"{t('showing_events')}: {len(filtered_df)}")
 
     # Center logic
     if state.filters.city != "All Cities" and not filtered_df.empty:
@@ -72,7 +79,7 @@ else:
 
             # Styled popup
             price = row.get("price", 0)
-            price_str = "Free" if price == 0 else f"{int(price)} TMT"
+            price_str = t("free") if price == 0 else f"{int(price)} TMT"
             price_color = "#10B981" if price == 0 else "#6366F1"
 
             date_str = ""

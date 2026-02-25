@@ -1,7 +1,7 @@
 import streamlit as st
-import pathlib
 from utils.data_loader import load_data
 from utils.filters import apply_filters
+from utils.i18n import t, render_language_selector
 from state_manager import get_state
 from components.styles import (
     inject_custom_css, render_section_header,
@@ -13,45 +13,52 @@ from config import CATEGORY_CONFIG
 st.set_page_config(page_title="Events | Event Discovery", page_icon="📋", layout="wide")
 
 inject_custom_css()
+render_language_selector()
 
 # Load Data & State
 df = load_data()
 state = get_state()
 
 # Title
-st.title("📋 Events List")
+st.title(f"📋 {t('events_page_title')}")
 
 if df.empty:
-    st.error("No data found. Please check data/events.json.")
+    st.error(t("no_events"))
     st.stop()
 
 # --- SIDEBAR FILTERS ---
 with st.sidebar:
-    st.header("🔍 Filter Events")
+    st.header(f"🔍 {t('filter_by_category')}")
 
     # Search
     state.filters.search_query = st.text_input(
-        "Search", value=state.filters.search_query, placeholder="Title, venue..."
+        t("search_events"), value=state.filters.search_query, placeholder=t("search_events")
     )
 
     # City
-    city_options = ["All Cities"] + sorted(df["city"].unique().tolist())
+    city_options = [t("all_cities")] + sorted(df["city"].unique().tolist())
+    current_city = state.filters.city
+    if current_city == "All Cities":
+        current_city = t("all_cities")
     state.filters.city = st.selectbox(
-        "City",
+        t("event_city"),
         city_options,
-        index=city_options.index(state.filters.city) if state.filters.city in city_options else 0
+        index=city_options.index(current_city) if current_city in city_options else 0
     )
+    # Map translated "All Cities" back to internal value
+    if state.filters.city == t("all_cities"):
+        state.filters.city = "All Cities"
 
     # Categories
     cat_options = sorted(df["category"].unique().tolist())
     state.filters.categories = st.multiselect(
-        "Categories", cat_options, default=state.filters.categories
+        t("filter_by_category"), cat_options, default=state.filters.categories
     )
 
     # Date
     date_options = ["All", "Today", "This Week", "This Month"]
     state.filters.date_preset = st.selectbox(
-        "Date",
+        t("event_date"),
         date_options,
         index=date_options.index(state.filters.date_preset)
         if state.filters.date_preset in date_options else 0
@@ -61,10 +68,10 @@ with st.sidebar:
     if "price" in df.columns:
         max_p = int(df["price"].max())
         state.filters.max_price = st.slider(
-            "Max Price", 0, max_p, state.filters.max_price
+            t("event_price"), 0, max_p, state.filters.max_price
         )
 
-    if st.button("🗑️ Reset Filters", type="primary", use_container_width=True):
+    if st.button(f"🗑️ {t('cancel')}", type="primary", use_container_width=True):
         state.reset_filters()
         st.rerun()
 
@@ -73,12 +80,12 @@ filtered_df = apply_filters(df, state.filters)
 
 # --- DISPLAY ---
 render_section_header(
-    f"Found {len(filtered_df)} events",
-    "Showing results matching your filters"
+    f"{len(filtered_df)} {t('events_found')}",
+    t("events_page_subtitle")
 )
 
 if filtered_df.empty:
-    st.info("No events match your filters. Try adjusting the sidebar filters.")
+    st.info(t("no_events"))
 else:
     for _, row in filtered_df.iterrows():
         cat = row.get("category", "Event")
@@ -106,14 +113,14 @@ else:
             description=row.get("description", ""),
         ), unsafe_allow_html=True)
 
-        # Save button (Streamlit button for interactivity)
+        # Save button
         col_spacer, col_save = st.columns([5, 1])
         with col_save:
             is_saved = state.ui.is_saved(row.get("id"))
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{row.get('id')}",
-                help="Save this event"
+                help=t("save")
             ):
                 state.ui.toggle_save(row.get("id"))
                 st.rerun()
