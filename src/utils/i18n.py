@@ -619,6 +619,38 @@ TRANSLATIONS = {
         "ru": "Очистить сохранённые",
         "tk": "Hemmesini arassala",
     },
+
+    # ─── Sidebar Navigation ──────────────────────
+    "nav_home": {
+        "en": "🏠 Home",
+        "ru": "🏠 Главная",
+        "tk": "🏠 Baş sahypa",
+    },
+    "nav_events": {
+        "en": "📋 Events",
+        "ru": "📋 События",
+        "tk": "📋 Çäreler",
+    },
+    "nav_map": {
+        "en": "🗺️ Map",
+        "ru": "🗺️ Карта",
+        "tk": "🗺️ Karta",
+    },
+    "nav_saved": {
+        "en": "⭐ Saved Events",
+        "ru": "⭐ Сохранённые",
+        "tk": "⭐ Saklananlar",
+    },
+    "nav_about": {
+        "en": "ℹ️ About",
+        "ru": "ℹ️ О приложении",
+        "tk": "ℹ️ Hakynda",
+    },
+    "nav_admin": {
+        "en": "🔧 Admin",
+        "ru": "🔧 Админ",
+        "tk": "🔧 Dolandyryjy",
+    },
 }
 
 # ─── Category name translations ─────────────────
@@ -665,13 +697,20 @@ def t_cat(category: str) -> str:
 
 
 def render_language_selector():
-    """Render language selector in sidebar."""
+    """Render language selector and translated navigation in sidebar."""
     current = get_lang()
     options = list(LANGUAGES.keys())
-    labels = list(LANGUAGES.values())
     idx = options.index(current) if current in options else 0
 
     with st.sidebar:
+        # Translated navigation links (replaces the hidden default nav)
+        st.page_link("0_🏠_Home.py", label=t("nav_home"))
+        st.page_link("pages/1_📋_Events.py", label=t("nav_events"))
+        st.page_link("pages/2_🗺️_Map.py", label=t("nav_map"))
+        st.page_link("pages/3_⭐_Saved_Events.py", label=t("nav_saved"))
+        st.page_link("pages/4_ℹ️_About.py", label=t("nav_about"))
+        st.page_link("pages/99_🔧_Admin.py", label=t("nav_admin"))
+
         st.markdown("---")
         selected = st.selectbox(
             "🌐 " + t("language"),

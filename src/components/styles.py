@@ -176,23 +176,42 @@ def inject_custom_css():
         justify-content: center;
     }
 
-    /* ── Equal height navigation / bordered containers in a row ── */
-    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {
-        height: 100%;
+    /* ── Equal height bordered containers in a column row ── */
+    [data-testid="stHorizontalBlock"] {
+        align-items: stretch !important;
     }
-    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+    [data-testid="stHorizontalBlock"] [data-testid="column"] {
+        display: flex !important;
+        flex-direction: column !important;
     }
-    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div > div {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
+    [data-testid="stHorizontalBlock"] [data-testid="column"] > div {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
-    /* Push the button to the bottom inside equal-height cards */
-    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] .stButton {
-        margin-top: auto;
+    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div > div {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    /* Push button to bottom inside equal-height cards */
+    [data-testid="stVerticalBlockBorderWrapper"] .stButton {
+        margin-top: auto !important;
+    }
+
+    /* ── Hide default Streamlit page navigation in sidebar ── */
+    [data-testid="stSidebarNav"] {
+        display: none !important;
     }
 
     /* ── Smooth scrolling ──────────────────────── */
