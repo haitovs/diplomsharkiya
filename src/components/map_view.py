@@ -293,19 +293,18 @@ def create_popup_html(row: pd.Series, image_data_uri: str = "") -> str:
 
     price_str = "Free" if price == 0 else f"{int(price)} TMT"
 
-    photo_btn_html = ""
-    photo_img_html = ""
+    photo_details_html = ""
     if image_data_uri:
-        photo_btn_html = (
-            '<button onclick="var img=this.parentElement.nextElementSibling;'
-            "img.style.display=img.style.display==='none'?'block':'none';\""
-            ' style="cursor:pointer;border:none;background:rgba(99,102,241,0.15);'
-            'color:#6366F1;border-radius:6px;padding:2px 8px;font-size:0.75rem;">'
-            '\U0001f4f7 Photo</button>'
-        )
-        photo_img_html = (
-            f'<img src="{image_data_uri}" style="display:none;width:100%;'
-            f'border-radius:6px;margin-top:6px;" />'
+        photo_details_html = (
+            '<details style="margin-top:6px;">'
+            '<summary style="cursor:pointer;display:inline-block;'
+            'background:rgba(99,102,241,0.15);color:#6366F1;'
+            'border-radius:6px;padding:2px 8px;font-size:0.75rem;'
+            'font-weight:600;list-style:none;user-select:none;">'
+            '\U0001f4f7 Photo</summary>'
+            f'<img src="{image_data_uri}" style="max-height:90px;max-width:100%;'
+            f'object-fit:cover;border-radius:6px;margin-top:4px;display:block;" />'
+            '</details>'
         )
 
     html = f"""
@@ -320,9 +319,8 @@ def create_popup_html(row: pd.Series, image_data_uri: str = "") -> str:
         <div style="display:flex; align-items:center; gap:8px; margin: 4px 0; font-size: 12px;">
             <span style="background: #E2E8F0; padding: 2px 8px; border-radius: 4px;">{category}</span>
             <span style="font-weight: bold; color: #6366F1;">{price_str}</span>
-            {photo_btn_html}
         </div>
-        {photo_img_html}
+        {photo_details_html}
     </div>
     """
 

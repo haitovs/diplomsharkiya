@@ -24,7 +24,8 @@ def get_event_image_base64(image_path: str) -> str:
         return _image_cache[image_path]
 
     full_path = DATA_DIR / image_path
-    if not full_path.exists():
+    if not full_path.exists() or full_path.stat().st_size < 500:
+        # Files under 500 bytes are broken/placeholder — skip them
         return ""
 
     try:
