@@ -32,14 +32,43 @@ render_hero(
 from utils.data_loader import load_data
 df = load_data()
 
-# Stats Row
-c1, c2, c3 = st.columns(3)
-with c1:
-    st.metric(f"🎉 {t('upcoming_events')}", len(df), delta=t("live_now"))
-with c2:
-    st.metric(f"🏙️ {t('cities_covered')}", df["city"].nunique() if not df.empty else 0)
-with c3:
-    st.metric(f"❤️ {t('community')}", t("growing"))
+# Stats Row — rendered as HTML for guaranteed equal height
+_ev_count = len(df)
+_city_count = df["city"].nunique() if not df.empty else 0
+st.markdown(f"""
+<div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+    <div style="flex:1; background: linear-gradient(135deg,#141B34,#1A2238);
+        border:1px solid rgba(99,102,241,0.15); border-radius:12px;
+        padding:1rem 1.25rem;">
+        <p style="color:#94A3B8; font-weight:500; font-size:0.85rem;
+            text-transform:uppercase; letter-spacing:0.05em; margin:0;">
+            🎉 {t('upcoming_events')}</p>
+        <p style="color:#F8FAFC; font-weight:700; font-size:1.75rem; margin:0.25rem 0 0 0;">
+            {_ev_count}</p>
+        <p style="color:#10B981; font-size:0.85rem; margin:0.15rem 0 0 0;">↑ {t('live_now')}</p>
+    </div>
+    <div style="flex:1; background: linear-gradient(135deg,#141B34,#1A2238);
+        border:1px solid rgba(99,102,241,0.15); border-radius:12px;
+        padding:1rem 1.25rem;">
+        <p style="color:#94A3B8; font-weight:500; font-size:0.85rem;
+            text-transform:uppercase; letter-spacing:0.05em; margin:0;">
+            🏙️ {t('cities_covered')}</p>
+        <p style="color:#F8FAFC; font-weight:700; font-size:1.75rem; margin:0.25rem 0 0 0;">
+            {_city_count}</p>
+        <p style="color:transparent; font-size:0.85rem; margin:0.15rem 0 0 0;">.</p>
+    </div>
+    <div style="flex:1; background: linear-gradient(135deg,#141B34,#1A2238);
+        border:1px solid rgba(99,102,241,0.15); border-radius:12px;
+        padding:1rem 1.25rem;">
+        <p style="color:#94A3B8; font-weight:500; font-size:0.85rem;
+            text-transform:uppercase; letter-spacing:0.05em; margin:0;">
+            ❤️ {t('community')}</p>
+        <p style="color:#F8FAFC; font-weight:700; font-size:1.75rem; margin:0.25rem 0 0 0;">
+            {t('growing')}</p>
+        <p style="color:transparent; font-size:0.85rem; margin:0.15rem 0 0 0;">.</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
 

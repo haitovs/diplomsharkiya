@@ -181,15 +181,32 @@ with tab_events:
                 f"{cat_display} · **{event.get('title', 'Untitled')}** — "
                 f"{event.get('city', '')} · {price_str}"
             ):
-                col_info, col_actions = st.columns([3, 1])
+                # ── Event overview row: image + info + actions ──
+                col_img, col_info, col_actions = st.columns([1, 3, 1])
+
+                with col_img:
+                    cur_img_path = pathlib.Path(__file__).parent.parent.parent / "data" / event.get("image", "")
+                    if event.get("image") and cur_img_path.exists():
+                        st.image(str(cur_img_path), width=120)
+                    else:
+                        st.markdown(
+                            '<div style="width:120px;height:80px;background:#1A2238;'
+                            'border-radius:8px;display:flex;align-items:center;'
+                            'justify-content:center;color:#475569;font-size:2rem;">🖼️</div>',
+                            unsafe_allow_html=True
+                        )
 
                 with col_info:
-                    st.markdown(f"**ID:** `{event.get('id', 'N/A')}`")
-                    st.markdown(f"**{t('venue_label')}:** {event.get('venue', 'N/A')}")
-                    st.markdown(f"**{t('event_date')}:** {event.get('date_start', 'N/A')}")
-                    st.markdown(f"**{t('price_label')}:** {price_str}")
+                    st.markdown(
+                        f"**{t('venue_label')}:** {event.get('venue', 'N/A')} · "
+                        f"**{t('event_city')}:** {event.get('city', 'N/A')}"
+                    )
+                    st.markdown(
+                        f"**{t('event_date')}:** {event.get('date_start', 'N/A')} · "
+                        f"**{t('price_label')}:** {price_str}"
+                    )
                     if event.get("description"):
-                        st.markdown(f"**{t('event_description')}:** {event['description'][:200]}")
+                        st.caption(f"{event['description'][:150]}")
 
                 with col_actions:
                     if st.button(f"📋 {t('duplicate')}", key=f"dup_{event['id']}",
@@ -207,26 +224,30 @@ with tab_events:
                         save_events(events)
                         st.rerun()
 
-                # Edit form (clean, flat)
-                st.markdown(f"##### ✏️ {t('edit')}")
+                st.markdown("---")
+
+                # ── Edit form — balanced 3-column grid ──
+                st.markdown(f"**✏️ {t('edit')}**")
                 with st.form(key=f"edit_{event['id']}"):
-                    ec1, ec2 = st.columns(2)
+                    ec1, ec2, ec3 = st.columns(3)
                     with ec1:
                         e_title = st.text_input(t("title_field"), value=event.get("title", ""))
-                        e_venue = st.text_input(t("venue_label"), value=event.get("venue", ""))
                         e_city = st.selectbox(t("event_city"), CITIES,
                                               index=CITIES.index(event.get("city", "Ashgabat"))
                                               if event.get("city") in CITIES else 0)
+                    with ec2:
+                        e_venue = st.text_input(t("venue_label"), value=event.get("venue", ""))
                         e_cat = st.selectbox(t("event_category"), CATEGORIES,
                                              index=CATEGORIES.index(event.get("category", "Music"))
                                              if event.get("category") in CATEGORIES else 0)
-                    with ec2:
+                    with ec3:
                         e_price = st.number_input(t("price_label"), value=float(event.get("price", 0)),
                                                   min_value=0.0, step=5.0)
                         e_pop = st.slider(t("popularity"), 1, 100,
                                           int(event.get("popularity", 50)))
-                        e_desc = st.text_area(t("event_description"),
-                                              value=event.get("description", ""), height=100)
+
+                    e_desc = st.text_area(t("event_description"),
+                                          value=event.get("description", ""), height=80)
 
                     if st.form_submit_button(f"💾 {t('save')}", use_container_width=True):
                         for i, e in enumerate(events):
@@ -246,38 +267,30 @@ with tab_events:
                         st.success(f"✅ {t('save')}")
                         st.rerun()
 
-                # Image upload per event (outside form — file_uploader can't be in st.form)
-                st.markdown(f"###### 🖼️ {t('upload_image')}")
-                img_col_preview, img_col_upload = st.columns([1, 2])
-                with img_col_preview:
-                    # Show current image or new upload preview
+                # ── Image upload (outside form) ──
+                img_up_col, img_preview_col = st.columns([2, 1])
+                with img_up_col:
                     evt_img = st.file_uploader(
-                        t("upload_image"),
+                        f"🖼️ {t('upload_image')}",
                         type=["jpg", "jpeg", "png", "webp"],
-                        key=f"img_upload_{event['id']}"
+                        key=f"img_upload_{event['id']}",
+                        label_visibility="collapsed"
                     )
-                with img_col_upload:
+                with img_preview_col:
                     if evt_img:
-                        st.image(evt_img, width=180, caption="New")
-                    elif event.get("image"):
-                        cur_img_path = pathlib.Path(__file__).parent.parent.parent / "data" / event["image"]
-                        if cur_img_path.exists():
-                            st.image(str(cur_img_path), width=180, caption="Current")
+                        st.image(evt_img, width=140, caption=t("upload_image"))
 
                 if evt_img:
-                    if st.button(f"💾 {t('save')}", key=f"save_img_{event['id']}",
-                                 type="primary"):
+                    if st.button(f"💾 {t('save')} {t('upload_image')}", key=f"save_img_{event['id']}",
+                                 type="primary", use_container_width=True):
                         IMG_DIR.mkdir(parents=True, exist_ok=True)
 
-                        # Always save as .jpg for consistency
                         img_filename = f"{event['id']}.jpg"
                         img_path = IMG_DIR / img_filename
 
-                        # Write uploaded bytes to disk
                         with open(img_path, "wb") as fimg:
                             fimg.write(evt_img.getbuffer())
 
-                        # Resize to thumbnail for performance
                         try:
                             from PIL import Image as PILImage
                             pil_img = PILImage.open(img_path)
@@ -288,16 +301,12 @@ with tab_events:
                         except Exception:
                             pass
 
-                        # Clear old image path from cache if it changed
                         from utils.data_loader import _image_cache
                         old_image = event.get("image", "")
                         _image_cache.pop(old_image, None)
                         _image_cache.pop(f"images/{img_filename}", None)
-
-                        # Also clear streamlit's data cache so load_data() refreshes
                         st.cache_data.clear()
 
-                        # Update event record
                         new_image_path = f"images/{img_filename}"
                         for i, e in enumerate(events):
                             if e["id"] == event["id"]:
@@ -312,24 +321,26 @@ with tab_events:
     st.markdown(f"### ➕ {t('add_event')}")
 
     with st.form("add_event"):
-        ac1, ac2 = st.columns(2)
+        ac1, ac2, ac3 = st.columns(3)
 
         with ac1:
             new_title = st.text_input(f"{t('title_field')} *", placeholder="Event name")
-            new_cat = st.selectbox(f"{t('event_category')} *", CATEGORIES, key="new_cat")
             new_city = st.selectbox(f"{t('event_city')} *", CITIES, key="new_city")
-            new_venue = st.text_input(f"{t('venue_label')} *", placeholder="Location name")
-            new_price = st.number_input(t("event_price"), min_value=0.0, step=5.0, value=0.0)
-
-        with ac2:
             new_date_start = st.date_input(f"{t('start_date')} *",
                                            value=datetime.now().date() + timedelta(days=7))
             new_time_start = st.time_input(f"{t('start_time')} *",
                                            value=datetime.strptime("18:00", "%H:%M").time())
+
+        with ac2:
+            new_venue = st.text_input(f"{t('venue_label')} *", placeholder="Location name")
+            new_cat = st.selectbox(f"{t('event_category')} *", CATEGORIES, key="new_cat")
             new_date_end = st.date_input(f"{t('end_date')} *",
                                          value=datetime.now().date() + timedelta(days=7))
             new_time_end = st.time_input(f"{t('end_time')} *",
                                          value=datetime.strptime("21:00", "%H:%M").time())
+
+        with ac3:
+            new_price = st.number_input(t("event_price"), min_value=0.0, step=5.0, value=0.0)
             new_pop = st.slider(t("popularity"), 1, 100, 50, key="new_pop")
 
         new_desc = st.text_area(t("event_description"), placeholder="...", key="new_desc")

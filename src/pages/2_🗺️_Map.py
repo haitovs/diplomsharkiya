@@ -59,21 +59,25 @@ else:
         center = [37.9601, 58.3261]
         zoom = 6
 
-    # Use OpenStreetMap tiles (default, works on internet-connected server)
-    # CartoDB Positron is available as a cleaner alternative
-    m = folium.Map(
-        location=center,
-        zoom_start=zoom,
-        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    )
+    # OpenStreetMap as default tile layer
+    m = folium.Map(location=center, zoom_start=zoom, tiles=None)
 
-    # Add CartoDB Positron as alternative tile layer
+    folium.TileLayer(
+        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        name="OpenStreetMap",
+        overlay=False,
+        control=True,
+    ).add_to(m)
+
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         attr='&copy; <a href="https://carto.com/">CARTO</a>',
         name="CartoDB Positron",
+        overlay=False,
+        control=True,
     ).add_to(m)
+
     folium.LayerControl().add_to(m)
 
     for _, row in filtered_df.iterrows():
