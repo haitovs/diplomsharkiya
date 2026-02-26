@@ -51,13 +51,13 @@ if filtered_df.empty:
 else:
     st.caption(f"{t('showing_events')}: {len(filtered_df)}")
 
-    # Center logic
+    # Center logic — default zoomed on Ashgabat
     if state.filters.city != "All Cities" and not filtered_df.empty:
         center = [filtered_df.iloc[0]["lat"], filtered_df.iloc[0]["lon"]]
-        zoom = 12
+        zoom = 13
     else:
         center = [37.9601, 58.3261]
-        zoom = 6
+        zoom = 12
 
     # OpenStreetMap as default tile layer
     m = folium.Map(location=center, zoom_start=zoom, tiles=None)
@@ -88,7 +88,13 @@ else:
             cat_color = get_category_color_hex(cat)
             cat_display = t_cat(cat)
 
-            icon_obj = folium.Icon(color="blue", icon="info-sign")
+            icon_obj = folium.DivIcon(
+                html=f'<div style="font-size:1.6rem;text-align:center;'
+                     f'line-height:1;text-shadow:0 1px 3px rgba(0,0,0,0.4);">'
+                     f'{cat_icon}</div>',
+                icon_size=(32, 32),
+                icon_anchor=(16, 16),
+            )
 
             price = row.get("price", 0)
             price_str = t("free") if price == 0 else f"{int(price)} TMT"

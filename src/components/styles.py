@@ -265,28 +265,36 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
     img_html = ""
     if image_data_uri:
         img_html = f'''<img src="{image_data_uri}" style="
-            width: 110px; height: 90px; object-fit: cover; border-radius: 8px;
-            flex-shrink: 0; margin-right: 1rem;
+            width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
         " alt="{title}"/>'''
 
     return f"""
     <div style="
         background: #141B34; border: 1px solid rgba(99, 102, 241, 0.12);
         border-left: 4px solid {cat_color}; border-radius: 12px;
-        padding: 1.25rem; margin-bottom: 0.75rem;
+        overflow: hidden; margin-bottom: 0.75rem;
         transition: all 0.2s ease;
     ">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            {img_html}
-            <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <span style="font-size: 1.25rem;">{cat_icon}</span>
-                    <span style="
-                        background: rgba(99, 102, 241, 0.1); color: #818CF8;
-                        padding: 0.15rem 0.6rem; border-radius: 20px;
-                        font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-                        letter-spacing: 0.05em;
-                    ">{category}</span>
+        <div style="display: flex; align-items: stretch;">
+            <div style="flex: 0 0 50%; max-width: 50%; min-height: 140px;">
+                {img_html}
+            </div>
+            <div style="flex: 1; padding: 1rem 1.25rem; display: flex; flex-direction: column; justify-content: center;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.25rem;">{cat_icon}</span>
+                        <span style="
+                            background: rgba(99, 102, 241, 0.1); color: #818CF8;
+                            padding: 0.15rem 0.6rem; border-radius: 20px;
+                            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                        ">{category}</span>
+                    </div>
+                    <div style="
+                        background: {price_bg}; color: {price_fg};
+                        padding: 0.35rem 0.85rem; border-radius: 8px;
+                        font-weight: 700; font-size: 0.9rem; white-space: nowrap;
+                    ">{price_str}</div>
                 </div>
                 <h4 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #F8FAFC;">{title}</h4>
                 <p style="color: #94A3B8; font-size: 0.85rem; margin: 0.35rem 0 0 0;">
@@ -294,12 +302,6 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
                 </p>
                 {desc_html}
             </div>
-            <div style="
-                background: {price_bg}; color: {price_fg};
-                padding: 0.35rem 0.85rem; border-radius: 8px;
-                font-weight: 700; font-size: 0.9rem; white-space: nowrap;
-                margin-left: 1rem;
-            ">{price_str}</div>
         </div>
     </div>
     """

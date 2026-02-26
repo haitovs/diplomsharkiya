@@ -104,23 +104,22 @@ else:
         img_uri = get_event_image_base64(row.get("image", ""))
         is_saved = state.ui.is_saved(row.get("id"))
 
-        # Card + save button on same row, tight layout
-        col_card, col_btn = st.columns([20, 1])
-        with col_card:
-            st.markdown(render_event_card_html(
-                title=row.get("title", "Untitled"),
-                venue=row.get("venue", "TBA"),
-                city=row.get("city", "Unknown"),
-                date_str=date_str,
-                price=row.get("price", 0),
-                category=t_cat(cat),
-                cat_icon=cat_icon,
-                cat_color=cat_color,
-                description=row.get("description", ""),
-                free_text=t("free"),
-                image_data_uri=img_uri,
-            ), unsafe_allow_html=True)
-        with col_btn:
+        st.markdown(render_event_card_html(
+            title=row.get("title", "Untitled"),
+            venue=row.get("venue", "TBA"),
+            city=row.get("city", "Unknown"),
+            date_str=date_str,
+            price=row.get("price", 0),
+            category=t_cat(cat),
+            cat_icon=cat_icon,
+            cat_color=cat_color,
+            description=row.get("description", ""),
+            free_text=t("free"),
+            image_data_uri=img_uri,
+        ), unsafe_allow_html=True)
+        # Like button right-aligned under card
+        _, like_col = st.columns([20, 1])
+        with like_col:
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{row.get('id')}",
