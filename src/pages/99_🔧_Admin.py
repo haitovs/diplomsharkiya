@@ -191,6 +191,8 @@ with tab_events:
                     st.markdown(f"**{t('venue_label')}:** {event.get('venue', 'N/A')}")
                     st.markdown(f"**{t('event_date')}:** {event.get('date_start', 'N/A')}")
                     st.markdown(f"**{t('price_label')}:** {price_str}")
+                    if event.get("image"):
+                        st.caption(f"🖼️ {event['image']}")
                     if event.get("description"):
                         st.markdown(f"**{t('event_description')}:** {event['description'][:200]}")
 
@@ -249,6 +251,44 @@ with tab_events:
                         st.success(f"✅ {t('save')}")
                         st.rerun()
 
+                # Image upload per event (outside form — file_uploader can't be in st.form)
+                st.markdown(f"###### 🖼️ {t('upload_image')}")
+                evt_img = st.file_uploader(
+                    t("upload_image"),
+                    type=["jpg", "jpeg", "png", "webp"],
+                    key=f"img_upload_{event['id']}"
+                )
+                if evt_img:
+                    if st.button(f"💾 {t('save')}", key=f"save_img_{event['id']}",
+                                 type="primary"):
+                        IMG_DIR.mkdir(parents=True, exist_ok=True)
+                        ext = evt_img.name.split(".")[-1]
+                        img_filename = f"{event['id']}.{ext}"
+                        img_path = IMG_DIR / img_filename
+                        with open(img_path, "wb") as fimg:
+                            fimg.write(evt_img.getbuffer())
+                        # Resize to thumbnail for performance
+                        try:
+                            from PIL import Image
+                            pil_img = Image.open(img_path)
+                            if pil_img.mode == "RGBA":
+                                pil_img = pil_img.convert("RGB")
+                            pil_img.thumbnail((400, 400), Image.LANCZOS)
+                            pil_img.save(img_path, quality=80, optimize=True)
+                        except Exception:
+                            pass
+                        for i, e in enumerate(events):
+                            if e["id"] == event["id"]:
+                                events[i]["image"] = f"images/{img_filename}"
+                                break
+                        save_events(events)
+                        # Clear base64 cache so new image is picked up
+                        from utils.data_loader import _image_cache
+                        _image_cache.pop(f"images/{img_filename}", None)
+                        st.success(f"✅ {t('save')}")
+                        st.image(str(img_path), width=200)
+                        st.rerun()
+
     # --- Add New Event form ---
     st.divider()
     st.markdown(f"### ➕ {t('add_event')}")
@@ -303,45 +343,6 @@ with tab_events:
                 save_events(events)
                 st.success(f"✅ {t('event_added')}")
                 st.balloons()
-
-    # --- Image Upload ---
-    st.divider()
-    st.markdown(f"### 🖼️ {t('upload_image')}")
-
-    if events:
-        event_titles = {e["id"]: e.get("title", "Untitled") for e in events}
-        selected_event_id = st.selectbox(
-            t("event_title"),
-            options=list(event_titles.keys()),
-            format_func=lambda x: event_titles[x],
-            key="img_event_select"
-        )
-
-        uploaded_img = st.file_uploader(
-            t("upload_image"),
-            type=["jpg", "jpeg", "png", "webp"],
-            key="event_img_upload"
-        )
-
-        if uploaded_img and selected_event_id:
-            if st.button(f"💾 {t('save')}", key="save_img", type="primary"):
-                IMG_DIR.mkdir(parents=True, exist_ok=True)
-                ext = uploaded_img.name.split(".")[-1]
-                img_filename = f"{selected_event_id}.{ext}"
-                img_path = IMG_DIR / img_filename
-
-                with open(img_path, "wb") as f:
-                    f.write(uploaded_img.getbuffer())
-
-                for e in events:
-                    if e["id"] == selected_event_id:
-                        e["image"] = f"images/{img_filename}"
-                        break
-                save_events(events)
-                st.success(f"✅ {t('save')}")
-                st.image(str(img_path), width=300)
-    else:
-        st.info(t("no_events"))
 
 # ═════════════════ TAB 2: Settings ═════════════════
 with tab_settings:

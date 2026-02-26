@@ -176,9 +176,23 @@ def inject_custom_css():
         justify-content: center;
     }
 
-    /* pull save-button row tighter to the card above */
-    [data-testid="column"] .stButton {
-        margin-top: -0.75rem;
+    /* ── Equal height navigation / bordered containers in a row ── */
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {
+        height: 100%;
+    }
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div > div {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    /* Push the button to the bottom inside equal-height cards */
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] .stButton {
+        margin-top: auto;
     }
 
     /* ── Smooth scrolling ──────────────────────── */

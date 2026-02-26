@@ -102,30 +102,29 @@ else:
                 date_str = str(start)
 
         img_uri = get_event_image_base64(row.get("image", ""))
-
-        st.markdown(render_event_card_html(
-            title=row.get("title", "Untitled"),
-            venue=row.get("venue", "TBA"),
-            city=row.get("city", "Unknown"),
-            date_str=date_str,
-            price=row.get("price", 0),
-            category=t_cat(cat),
-            cat_icon=cat_icon,
-            cat_color=cat_color,
-            description=row.get("description", ""),
-            free_text=t("free"),
-            image_data_uri=img_uri,
-        ), unsafe_allow_html=True)
-
-        # Save button — tight to card, right-aligned
         is_saved = state.ui.is_saved(row.get("id"))
-        col_l, col_r = st.columns([10, 1])
-        with col_r:
+
+        # Card + save button on same row, tight layout
+        col_card, col_btn = st.columns([20, 1])
+        with col_card:
+            st.markdown(render_event_card_html(
+                title=row.get("title", "Untitled"),
+                venue=row.get("venue", "TBA"),
+                city=row.get("city", "Unknown"),
+                date_str=date_str,
+                price=row.get("price", 0),
+                category=t_cat(cat),
+                cat_icon=cat_icon,
+                cat_color=cat_color,
+                description=row.get("description", ""),
+                free_text=t("free"),
+                image_data_uri=img_uri,
+            ), unsafe_allow_html=True)
+        with col_btn:
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{row.get('id')}",
                 help=t("save"),
-                use_container_width=True,
             ):
                 state.ui.toggle_save(row.get("id"))
                 st.rerun()
