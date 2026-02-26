@@ -18,6 +18,11 @@ TRANSLATIONS = {
         "ru": "Открытие Событий",
         "tk": "Çäreleri Tapyň",
     },
+    "event_discovery_platform": {
+        "en": "Event Discovery Platform",
+        "ru": "Платформа Открытия Событий",
+        "tk": "Çäreleri Tapyş Platformasy",
+    },
     "app_subtitle": {
         "en": "Your Gateway to Local Events in Turkmenistan",
         "ru": "Ваш путеводитель по событиям Туркменистана",

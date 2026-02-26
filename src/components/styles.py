@@ -203,7 +203,7 @@ def inject_custom_css():
     """, unsafe_allow_html=True)
 
 
-def render_hero(title: str, subtitle: str, icon: str = "🎟️"):
+def render_hero(title: str, subtitle: str, icon: str = "🎟️", badge: str = "Event Discovery Platform"):
     """Render a premium gradient hero banner."""
     st.markdown(f"""
     <div style="
@@ -227,7 +227,7 @@ def render_hero(title: str, subtitle: str, icon: str = "🎟️"):
             background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
             border-radius: 20px; font-size: 0.85rem; font-weight: 500;
             margin-bottom: 0.75rem; backdrop-filter: blur(4px);
-        ">{icon} Event Discovery Platform</p>
+        ">{icon} {badge}</p>
         <h1 style="
             color: white !important; margin: 0 0 0.5rem 0;
             font-size: 2.25rem; font-weight: 700; letter-spacing: -0.03em;

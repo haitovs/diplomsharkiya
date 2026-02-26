@@ -78,19 +78,17 @@ def check_auth():
     """, unsafe_allow_html=True)
 
     with st.form("login"):
-        col_l, col_c, col_r = st.columns([1, 2, 1])
-        with col_c:
-            username = st.text_input(t("username"), placeholder="admin")
-            password = st.text_input(t("password"), type="password")
-            submit = st.form_submit_button(f"🔑 {t('login')}", use_container_width=True)
+        username = st.text_input(t("username"), placeholder="admin")
+        password = st.text_input(t("password"), type="password")
+        submit = st.form_submit_button(f"🔑 {t('login')}", use_container_width=True)
 
-            if submit:
-                if username == "admin" and password == ADMIN_PASSWORD:
-                    st.session_state.admin_auth = True
-                    st.session_state.admin_user = username
-                    st.rerun()
-                else:
-                    st.error(f"❌ {t('invalid_credentials')}")
+    if submit:
+        if username == "admin" and password == ADMIN_PASSWORD:
+            st.session_state.admin_auth = True
+            st.session_state.admin_user = username
+            st.rerun()
+        else:
+            st.error(f"❌ {t('invalid_credentials')}")
 
     return False
 

@@ -25,7 +25,8 @@ state = get_state()
 render_hero(
     title=t("app_title"),
     subtitle=t("app_subtitle"),
-    icon="🎟️"
+    icon="🎟️",
+    badge=t("event_discovery_platform"),
 )
 
 from utils.data_loader import load_data
