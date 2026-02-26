@@ -43,7 +43,7 @@ class CoreConfig:
     EVENTS_PER_PAGE = 20
     
     # Map
-    MAP_TILE_PROVIDER = "cartodbpositron"  # Clean, minimal tiles
+    MAP_TILE_PROVIDER = "OpenStreetMap"
     MAP_HEIGHT = 600
     ENABLE_MARKER_CLUSTERING = True
     

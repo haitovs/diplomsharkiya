@@ -39,6 +39,15 @@ def get_event_image_base64(image_path: str) -> str:
     except Exception:
         return ""
 
+def get_category_image_path(category: str) -> str:
+    """Return the category image path for a given category name.
+    Falls back to 'images/event_default.jpg' if no match.
+    """
+    if not category:
+        return "images/event_default.jpg"
+    return f"images/cat_{category.lower()}.jpg"
+
+
 @st.cache_data(ttl=60)
 def load_data():
     """

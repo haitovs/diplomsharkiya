@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-from utils.data_loader import load_data
+from utils.data_loader import load_data, get_event_image_base64, get_category_image_path
 from utils.filters import apply_filters
 from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
@@ -109,6 +109,27 @@ else:
                     raw = str(date_val)
                     date_str = raw.split("T")[0] if "T" in raw else raw
 
+            # Get base64 image for popup
+            img_path = row.get("image", "")
+            if not img_path or img_path == "images/event_default.jpg":
+                img_path = get_category_image_path(cat)
+            img_data_uri = get_event_image_base64(img_path)
+
+            photo_btn_html = ""
+            photo_img_html = ""
+            if img_data_uri:
+                photo_btn_html = (
+                    '<button onclick="var img=this.parentElement.nextElementSibling;'
+                    "img.style.display=img.style.display==='none'?'block':'none';\""
+                    ' style="cursor:pointer;border:none;background:rgba(99,102,241,0.15);'
+                    'color:#6366F1;border-radius:6px;padding:2px 8px;font-size:0.75rem;">'
+                    "\U0001f4f7 Photo</button>"
+                )
+                photo_img_html = (
+                    f'<img src="{img_data_uri}" style="display:none;width:100%;'
+                    f'border-radius:6px;margin-top:6px;" />'
+                )
+
             popup_html = f"""
             <div style="font-family:'Inter',sans-serif; width:220px; padding:4px;">
                 <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
@@ -127,11 +148,15 @@ else:
                 <p style="color:#555; font-size:0.78rem; margin:0 0 6px 0;">
                     {row.get('description', '')[:80]}{'...' if len(row.get('description', '')) > 80 else ''}
                 </p>
-                <div style="background:{price_color}15; color:{price_color};
-                    padding:3px 10px; border-radius:6px; display:inline-block;
-                    font-weight:700; font-size:0.85rem;">
-                    {price_str}
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="background:{price_color}15; color:{price_color};
+                        padding:3px 10px; border-radius:6px; display:inline-block;
+                        font-weight:700; font-size:0.85rem;">
+                        {price_str}
+                    </span>
+                    {photo_btn_html}
                 </div>
+                {photo_img_html}
             </div>
             """
 

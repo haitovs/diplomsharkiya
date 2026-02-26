@@ -11,7 +11,7 @@
     "popularity": 84,
     "lat": 37.9647,
     "lon": 58.3409,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "An outdoor evening with local jazz ensembles. Bring your own blanket or rent seating on-site.",
     "icon": "music"
   },
@@ -27,7 +27,7 @@
     "popularity": 92,
     "lat": 37.9591,
     "lon": 58.3368,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_tech.jpg",
     "description": "AI presentations, lightning talks, and networking night for tech enthusiasts.",
     "icon": "tech"
   },
@@ -43,7 +43,7 @@
     "popularity": 95,
     "lat": 38.0865,
     "lon": 58.167,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_food.jpg",
     "description": "Food stalls, local delicacies, and sweet treats from across Turkmenistan."
   },
   {
@@ -58,7 +58,7 @@
     "popularity": 97,
     "lat": 37.9119,
     "lon": 58.3007,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_sports.jpg",
     "description": "Local teams face off in an exciting match — expect an electrifying atmosphere.",
     "icon": "sports"
   },
@@ -74,7 +74,7 @@
     "popularity": 71,
     "lat": 37.9389,
     "lon": 58.3481,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Guided tour of exhibits with short talks and photo opportunities.",
     "icon": "art"
   },
@@ -90,7 +90,7 @@
     "popularity": 63,
     "lat": 37.9655,
     "lon": 58.3269,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Explore urban art installations around the historic railway station.",
     "icon": "art"
   },
@@ -106,7 +106,7 @@
     "popularity": 79,
     "lat": 37.9578,
     "lon": 58.3299,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_tech.jpg",
     "description": "Try modern games, meet game developers, free pizza included!",
     "icon": "tech"
   },
@@ -122,7 +122,7 @@
     "popularity": 56,
     "lat": 37.9782,
     "lon": 58.3311,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_wellness.jpg",
     "description": "Bring your mat, relax in nature. Suitable for beginners and advanced practitioners."
   },
   {
@@ -137,7 +137,7 @@
     "popularity": 88,
     "lat": 37.9476,
     "lon": 58.3344,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_film.jpg",
     "description": "Classic films under the stars. Bring your blanket for a cozy movie night."
   },
   {
@@ -152,7 +152,7 @@
     "popularity": 75,
     "lat": 37.9554,
     "lon": 58.3452,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_food.jpg",
     "description": "Stand-up comedy performances with dinner and drinks included."
   },
   {
@@ -167,7 +167,7 @@
     "popularity": 91,
     "lat": 37.9493,
     "lon": 58.3207,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "National orchestra performance celebrating the New Year.",
     "icon": "music"
   },
@@ -183,7 +183,7 @@
     "popularity": 80,
     "lat": 37.9622,
     "lon": 58.3291,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_market.jpg",
     "description": "Handcrafts, vintage finds, and local delicacies. Free entry!"
   },
   {
@@ -198,7 +198,7 @@
     "popularity": 72,
     "lat": 37.9483,
     "lon": 58.3122,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "Learn popular K-pop choreography at an affordable price.",
     "icon": "music"
   },
@@ -214,7 +214,7 @@
     "popularity": 89,
     "lat": 37.9235,
     "lon": 58.3721,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_business.jpg",
     "description": "5-minute pitches for startups, Q&A sessions, and networking opportunities."
   },
   {
@@ -229,7 +229,7 @@
     "popularity": 90,
     "lat": 37.9705,
     "lon": 58.3349,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_food.jpg",
     "description": "Gatlama, dograma, palaw — celebrate traditional Turkmen cuisine."
   },
   {
@@ -244,7 +244,7 @@
     "popularity": 76,
     "lat": 37.8892,
     "lon": 58.2641,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_sports.jpg",
     "description": "5 km running marathon with water stations and medals for top 3 finishers.",
     "icon": "sports"
   },
@@ -260,7 +260,7 @@
     "popularity": 65,
     "lat": 37.9584,
     "lon": 58.3233,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Short sketching workshop — pencils and paper provided.",
     "icon": "art"
   },
@@ -276,7 +276,7 @@
     "popularity": 58,
     "lat": 37.9364,
     "lon": 58.3506,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_wellness.jpg",
     "description": "Free-form yoga at sunrise with a gentle atmosphere — perfect for beginners."
   },
   {
@@ -291,7 +291,7 @@
     "popularity": 69,
     "lat": 37.9531,
     "lon": 58.3157,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_film.jpg",
     "description": "Screening of a classic film on Monday evening."
   },
   {
@@ -306,7 +306,7 @@
     "popularity": 77,
     "lat": 37.9689,
     "lon": 58.3432,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_market.jpg",
     "description": "Clothing, film cameras, books — trade and exchange welcome."
   },
   {
@@ -321,7 +321,7 @@
     "popularity": 73,
     "lat": 37.9417,
     "lon": 58.3284,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "Relaxing evening with oud musicians — tea set included.",
     "icon": "music"
   },
@@ -337,7 +337,7 @@
     "popularity": 81,
     "lat": 37.9636,
     "lon": 58.3215,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_tech.jpg",
     "description": "HTML/CSS/JS practical session for beginners.",
     "icon": "tech"
   },
@@ -353,7 +353,7 @@
     "popularity": 83,
     "lat": 37.9761,
     "lon": 58.3098,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_sports.jpg",
     "description": "3×3 basketball tournament — prizes for winners.",
     "icon": "sports"
   },
@@ -369,7 +369,7 @@
     "popularity": 66,
     "lat": 37.9567,
     "lon": 58.3336,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Hand ceramics workshop — take your finished piece home.",
     "icon": "art"
   },
@@ -385,7 +385,7 @@
     "popularity": 72,
     "lat": 37.9642,
     "lon": 58.356,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_tech.jpg",
     "description": "UI/UX prototyping and idea exchange for design teams.",
     "icon": "tech"
   },
@@ -401,7 +401,7 @@
     "popularity": 68,
     "lat": 39.0733,
     "lon": 63.5786,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_market.jpg",
     "description": "Local foods, handicrafts, and family recreation area."
   },
   {
@@ -416,7 +416,7 @@
     "popularity": 72,
     "lat": 37.6005,
     "lon": 61.8302,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_science.jpg",
     "description": "Telescope viewing of the Moon and stars — great for astrophotography."
   },
   {
@@ -431,7 +431,7 @@
     "popularity": 74,
     "lat": 39.5104,
     "lon": 54.3672,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "Local rock bands, open stage, and light show.",
     "icon": "music"
   },
@@ -447,7 +447,7 @@
     "popularity": 71,
     "lat": 41.8387,
     "lon": 59.965,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_kids.jpg",
     "description": "Robotics demo, mini experiments, and STEM games — parent seating available."
   },
   {
@@ -462,7 +462,7 @@
     "popularity": 80,
     "lat": 40.0224,
     "lon": 52.9693,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_sports.jpg",
     "description": "Beach volleyball, DJ sets, and prizes for participants.",
     "icon": "sports"
   },
@@ -478,7 +478,7 @@
     "popularity": 86,
     "lat": 37.9572,
     "lon": 58.3811,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_business.jpg",
     "description": "3-minute pitches, Q&A, and networking event for entrepreneurs."
   },
   {
@@ -493,7 +493,7 @@
     "popularity": 62,
     "lat": 37.9971,
     "lon": 58.3142,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_market.jpg",
     "description": "Handicrafts, ceramics, carpets, delicious tea, and local foods for sale."
   },
   {
@@ -508,7 +508,7 @@
     "popularity": 64,
     "lat": 37.948,
     "lon": 58.3379,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Night photography walk — any camera or phone welcome.",
     "icon": "art"
   },
@@ -524,7 +524,7 @@
     "popularity": 78,
     "lat": 37.9324,
     "lon": 58.3534,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Creative dance compositions and art exhibition.",
     "icon": "art"
   },
@@ -540,7 +540,7 @@
     "popularity": 69,
     "lat": 37.6041,
     "lon": 61.8247,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_food.jpg",
     "description": "Regional dishes, desserts, and culinary master classes."
   },
   {
@@ -555,7 +555,7 @@
     "popularity": 75,
     "lat": 37.9445,
     "lon": 58.3831,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_sports.jpg",
     "description": "City bike ride — bring your lit gear!",
     "icon": "sports"
   },
@@ -571,7 +571,7 @@
     "popularity": 58,
     "lat": 39.0669,
     "lon": 63.5737,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_community.jpg",
     "description": "Book exchange, reader talks, and tea stand."
   },
   {
@@ -586,7 +586,7 @@
     "popularity": 63,
     "lat": 39.5142,
     "lon": 54.3651,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_business.jpg",
     "description": "Light brunch, pitch proposals, and mini mentorship stations."
   },
   {
@@ -601,7 +601,7 @@
     "popularity": 70,
     "lat": 41.8362,
     "lon": 59.9674,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "description": "Holiday concert with national music and dance groups.",
     "icon": "music"
   },
@@ -617,7 +617,7 @@
     "popularity": 82,
     "lat": 40.0132,
     "lon": 52.9701,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_travel.jpg",
     "description": "Watch the sunset from the sea — DJ set and light snacks included."
   },
   {
@@ -632,7 +632,7 @@
     "popularity": 61,
     "lat": 37.9552,
     "lon": 58.3307,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_food.jpg",
     "description": "Coffee tasting session with a short educational talk."
   },
   {
@@ -647,7 +647,7 @@
     "popularity": 67,
     "lat": 37.6009,
     "lon": 61.8205,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "description": "Open-air drama in good weather — local actors performing.",
     "icon": "art"
   },
@@ -663,7 +663,7 @@
     "popularity": 64,
     "lat": 39.0821,
     "lon": 63.5759,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_tech.jpg",
     "description": "Algorithm exercises, pair programming, and Q&A sessions.",
     "icon": "tech"
   },
@@ -679,7 +679,7 @@
     "popularity": 50,
     "lat": 37.9601,
     "lon": 58.3261,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_music.jpg",
     "icon": "music",
     "description": ""
   },
@@ -695,7 +695,7 @@
     "popularity": 50,
     "lat": 37.9601,
     "lon": 58.3261,
-    "image": "images/event_default.jpg",
+    "image": "images/cat_art.jpg",
     "icon": "art",
     "description": ""
   }
