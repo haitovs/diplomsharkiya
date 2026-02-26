@@ -189,8 +189,13 @@ with tab_events:
                     st.markdown(f"**{t('venue_label')}:** {event.get('venue', 'N/A')}")
                     st.markdown(f"**{t('event_date')}:** {event.get('date_start', 'N/A')}")
                     st.markdown(f"**{t('price_label')}:** {price_str}")
+                    # Show current image preview
                     if event.get("image"):
-                        st.caption(f"🖼️ {event['image']}")
+                        img_full_path = pathlib.Path(__file__).parent.parent.parent / "data" / event["image"]
+                        if img_full_path.exists():
+                            st.image(str(img_full_path), width=150, caption=event["image"])
+                        else:
+                            st.caption(f"🖼️ {event['image']} (file missing)")
                     if event.get("description"):
                         st.markdown(f"**{t('event_description')}:** {event['description'][:200]}")
 
@@ -257,34 +262,49 @@ with tab_events:
                     key=f"img_upload_{event['id']}"
                 )
                 if evt_img:
+                    # Show preview of the uploaded file before saving
+                    st.image(evt_img, width=200, caption=f"Preview: {evt_img.name}")
+
                     if st.button(f"💾 {t('save')}", key=f"save_img_{event['id']}",
                                  type="primary"):
                         IMG_DIR.mkdir(parents=True, exist_ok=True)
-                        ext = evt_img.name.split(".")[-1]
-                        img_filename = f"{event['id']}.{ext}"
+
+                        # Always save as .jpg for consistency
+                        img_filename = f"{event['id']}.jpg"
                         img_path = IMG_DIR / img_filename
+
+                        # Write uploaded bytes to disk
                         with open(img_path, "wb") as fimg:
                             fimg.write(evt_img.getbuffer())
+
                         # Resize to thumbnail for performance
                         try:
-                            from PIL import Image
-                            pil_img = Image.open(img_path)
-                            if pil_img.mode == "RGBA":
+                            from PIL import Image as PILImage
+                            pil_img = PILImage.open(img_path)
+                            if pil_img.mode in ("RGBA", "P"):
                                 pil_img = pil_img.convert("RGB")
-                            pil_img.thumbnail((400, 400), Image.LANCZOS)
-                            pil_img.save(img_path, quality=80, optimize=True)
+                            pil_img.thumbnail((400, 400), PILImage.LANCZOS)
+                            pil_img.save(img_path, "JPEG", quality=80, optimize=True)
                         except Exception:
                             pass
+
+                        # Clear old image path from cache if it changed
+                        from utils.data_loader import _image_cache
+                        old_image = event.get("image", "")
+                        _image_cache.pop(old_image, None)
+                        _image_cache.pop(f"images/{img_filename}", None)
+
+                        # Also clear streamlit's data cache so load_data() refreshes
+                        st.cache_data.clear()
+
+                        # Update event record
+                        new_image_path = f"images/{img_filename}"
                         for i, e in enumerate(events):
                             if e["id"] == event["id"]:
-                                events[i]["image"] = f"images/{img_filename}"
+                                events[i]["image"] = new_image_path
                                 break
                         save_events(events)
-                        # Clear base64 cache so new image is picked up
-                        from utils.data_loader import _image_cache
-                        _image_cache.pop(f"images/{img_filename}", None)
                         st.success(f"✅ {t('save')}")
-                        st.image(str(img_path), width=200)
                         st.rerun()
 
     # --- Add New Event form ---
