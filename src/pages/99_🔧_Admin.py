@@ -21,7 +21,7 @@ render_language_selector()
 
 # ============ Config ============
 DATA_PATH = pathlib.Path(__file__).parent.parent.parent / "data" / "events.json"
-ADMIN_PASSWORD = "admin123"
+ADMIN_PASSWORD = "admin"
 
 CITIES = ["Ashgabat", "Mary", "Türkmenabat", "Dashoguz", "Balkanabat", "Awaza"]
 CATEGORIES = ["Music", "Tech", "Sports", "Food", "Art", "Market", "Film", "Wellness", "Business", "Science", "Kids", "Travel", "Community"]
