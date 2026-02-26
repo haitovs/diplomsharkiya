@@ -1,7 +1,6 @@
 # 🔧 Super Admin — Event Management System
 
 import streamlit as st
-import pandas as pd
 import pathlib
 import json
 from datetime import datetime, timedelta
@@ -189,13 +188,6 @@ with tab_events:
                     st.markdown(f"**{t('venue_label')}:** {event.get('venue', 'N/A')}")
                     st.markdown(f"**{t('event_date')}:** {event.get('date_start', 'N/A')}")
                     st.markdown(f"**{t('price_label')}:** {price_str}")
-                    # Show current image preview
-                    if event.get("image"):
-                        img_full_path = pathlib.Path(__file__).parent.parent.parent / "data" / event["image"]
-                        if img_full_path.exists():
-                            st.image(str(img_full_path), width=150, caption=event["image"])
-                        else:
-                            st.caption(f"🖼️ {event['image']} (file missing)")
                     if event.get("description"):
                         st.markdown(f"**{t('event_description')}:** {event['description'][:200]}")
 
@@ -256,15 +248,23 @@ with tab_events:
 
                 # Image upload per event (outside form — file_uploader can't be in st.form)
                 st.markdown(f"###### 🖼️ {t('upload_image')}")
-                evt_img = st.file_uploader(
-                    t("upload_image"),
-                    type=["jpg", "jpeg", "png", "webp"],
-                    key=f"img_upload_{event['id']}"
-                )
-                if evt_img:
-                    # Show preview of the uploaded file before saving
-                    st.image(evt_img, width=200, caption=f"Preview: {evt_img.name}")
+                img_col_preview, img_col_upload = st.columns([1, 2])
+                with img_col_preview:
+                    # Show current image or new upload preview
+                    evt_img = st.file_uploader(
+                        t("upload_image"),
+                        type=["jpg", "jpeg", "png", "webp"],
+                        key=f"img_upload_{event['id']}"
+                    )
+                with img_col_upload:
+                    if evt_img:
+                        st.image(evt_img, width=180, caption="New")
+                    elif event.get("image"):
+                        cur_img_path = pathlib.Path(__file__).parent.parent.parent / "data" / event["image"]
+                        if cur_img_path.exists():
+                            st.image(str(cur_img_path), width=180, caption="Current")
 
+                if evt_img:
                     if st.button(f"💾 {t('save')}", key=f"save_img_{event['id']}",
                                  type="primary"):
                         IMG_DIR.mkdir(parents=True, exist_ok=True)
