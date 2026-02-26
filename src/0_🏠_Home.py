@@ -46,27 +46,31 @@ st.divider()
 # Navigation Cards
 render_section_header(t("quick_navigation"), t("jump_to_section"))
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    with st.container(border=True):
-        st.markdown(f"### {t('browse_events')}")
-        st.markdown(t("browse_events_desc"))
-        if st.button(t("go_to_events"), use_container_width=True, type="primary"):
-            st.switch_page("pages/1_📋_Events.py")
+NAV_CARDS = [
+    {"title": t("browse_events"), "desc": t("browse_events_desc"), "btn": t("go_to_events"), "page": "pages/1_📋_Events.py"},
+    {"title": t("interactive_map"), "desc": t("interactive_map_desc"), "btn": t("open_map"), "page": "pages/2_🗺️_Map.py"},
+    {"title": t("saved_events"), "desc": t("saved_events_desc"), "btn": t("view_saved"), "page": "pages/3_⭐_Saved_Events.py"},
+]
 
-with col2:
-    with st.container(border=True):
-        st.markdown(f"### {t('interactive_map')}")
-        st.markdown(t("interactive_map_desc"))
-        if st.button(t("open_map"), use_container_width=True, type="primary"):
-            st.switch_page("pages/2_🗺️_Map.py")
+st.markdown("""
+<div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+""" + "".join(f"""
+<div style="
+    flex: 1; padding: 1.5rem;
+    background: #141B34; border: 1px solid rgba(99,102,241,0.15);
+    border-radius: 12px; display: flex; flex-direction: column;
+    min-height: 200px;
+">
+    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; font-weight: 600; color: #F8FAFC;">{c['title']}</h3>
+    <p style="color: #94A3B8; font-size: 0.9rem; flex: 1;">{c['desc']}</p>
+</div>
+""" for c in NAV_CARDS) + "</div>", unsafe_allow_html=True)
 
-with col3:
-    with st.container(border=True):
-        st.markdown(f"### {t('saved_events')}")
-        st.markdown(t("saved_events_desc"))
-        if st.button(t("view_saved"), use_container_width=True, type="primary"):
-            st.switch_page("pages/3_⭐_Saved_Events.py")
+nav_cols = st.columns(3)
+for i, card in enumerate(NAV_CARDS):
+    with nav_cols[i]:
+        if st.button(card["btn"], use_container_width=True, type="primary", key=f"nav_{i}"):
+            st.switch_page(card["page"])
 
 st.divider()
 

@@ -3,7 +3,13 @@ Event Discovery — Custom Styles
 Centralized CSS injection for premium Streamlit UI.
 """
 
+import html as _html
 import streamlit as st
+
+
+def _esc(text: str) -> str:
+    """Escape text for safe HTML embedding."""
+    return _html.escape(str(text)) if text else ""
 
 def inject_custom_css():
     """Inject custom CSS to override Streamlit defaults with the Event Discovery design system."""
@@ -176,38 +182,6 @@ def inject_custom_css():
         justify-content: center;
     }
 
-    /* ── Equal height bordered containers in a column row ── */
-    [data-testid="stHorizontalBlock"] {
-        align-items: stretch !important;
-    }
-    [data-testid="stHorizontalBlock"] [data-testid="column"] {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    [data-testid="stHorizontalBlock"] [data-testid="column"] > div {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    [data-testid="stHorizontalBlock"] [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div > div {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    /* Push button to bottom inside equal-height cards */
-    [data-testid="stVerticalBlockBorderWrapper"] .stButton {
-        margin-top: auto !important;
-    }
 
     /* ── Hide default Streamlit page navigation in sidebar ── */
     [data-testid="stSidebarNav"] {
@@ -275,7 +249,15 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
                            cat_color: str = "#6366F1", description: str = "",
                            free_text: str = "Free", image_data_uri: str = ""):
     """Render a premium styled event card using HTML."""
-    price_str = free_text if price == 0 else f"{int(price)} TMT"
+    # Escape all user-provided text to prevent broken HTML
+    title = _esc(title)
+    venue = _esc(venue)
+    city = _esc(city)
+    date_str = _esc(date_str)
+    category = _esc(category)
+    description = _esc(description)
+
+    price_str = _esc(free_text) if price == 0 else f"{int(price)} TMT"
     price_bg = "rgba(16, 185, 129, 0.15)" if price == 0 else "rgba(99, 102, 241, 0.15)"
     price_fg = "#10B981" if price == 0 else "#818CF8"
     desc_html = f'<p style="color: #94A3B8; font-size: 0.85rem; margin: 0.5rem 0 0 0; line-height: 1.5;">{description[:120]}{"..." if len(description) > 120 else ""}</p>' if description else ""
