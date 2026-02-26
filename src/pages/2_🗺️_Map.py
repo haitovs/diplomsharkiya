@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import st_folium
 from utils.data_loader import load_data
 from utils.filters import apply_filters
-from utils.i18n import t, render_language_selector
+from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
 from components.styles import inject_custom_css, get_category_color_hex
 from config import CATEGORY_CONFIG
@@ -40,6 +40,9 @@ with st.sidebar:
         t("filter_by_category"), cat_options, default=state.filters.categories
     )
 
+    st.markdown("---")
+    st.caption(f"ℹ️ {t('map_note')}")
+
 # --- APPLY FILTERS ---
 filtered_df = apply_filters(df, state.filters)
 
@@ -56,9 +59,8 @@ else:
         center = [37.9601, 58.3261]
         zoom = 6
 
-    import os
-
-    # Use OpenStreetMap tiles (most reliable)
+    # Use OpenStreetMap tiles (default, works on internet-connected server)
+    # CartoDB Positron is available as a cleaner alternative
     m = folium.Map(
         location=center,
         zoom_start=zoom,
@@ -66,17 +68,24 @@ else:
         attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     )
 
+    # Add CartoDB Positron as alternative tile layer
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://carto.com/">CARTO</a>',
+        name="CartoDB Positron",
+    ).add_to(m)
+    folium.LayerControl().add_to(m)
+
     for _, row in filtered_df.iterrows():
         if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
             cat = row.get("category", "Event")
             cat_cfg = CATEGORY_CONFIG.get(cat, {})
             cat_icon = cat_cfg.get("icon", "📌")
             cat_color = get_category_color_hex(cat)
+            cat_display = t_cat(cat)
 
-            # Use folium's built-in colored icons
             icon_obj = folium.Icon(color="blue", icon="info-sign")
 
-            # Styled popup
             price = row.get("price", 0)
             price_str = t("free") if price == 0 else f"{int(price)} TMT"
             price_color = "#10B981" if price == 0 else "#6366F1"
@@ -96,7 +105,7 @@ else:
                     <span style="font-size:1.2rem;">{cat_icon}</span>
                     <span style="background:rgba(99,102,241,0.12); color:#6366F1;
                         padding:2px 8px; border-radius:12px; font-size:0.7rem;
-                        font-weight:600; text-transform:uppercase;">{cat}</span>
+                        font-weight:600; text-transform:uppercase;">{cat_display}</span>
                 </div>
                 <h4 style="margin:0 0 4px 0; font-size:0.95rem; font-weight:600;">{row['title']}</h4>
                 <p style="color:#666; font-size:0.8rem; margin:0 0 4px 0;">

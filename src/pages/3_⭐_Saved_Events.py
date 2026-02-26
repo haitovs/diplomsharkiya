@@ -1,6 +1,6 @@
 import streamlit as st
-from utils.data_loader import load_data
-from utils.i18n import t, render_language_selector
+from utils.data_loader import load_data, get_event_image_base64
+from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
 from components.styles import (
     inject_custom_css, render_section_header,
@@ -55,16 +55,20 @@ else:
                 except Exception:
                     date_str = str(start)
 
+            img_uri = get_event_image_base64(row.get("image", ""))
+
             st.markdown(render_event_card_html(
                 title=row.get("title", "Untitled"),
                 venue=row.get("venue", "TBA"),
                 city=row.get("city", "Unknown"),
                 date_str=date_str,
                 price=row.get("price", 0),
-                category=cat,
+                category=t_cat(cat),
                 cat_icon=cat_icon,
                 cat_color=cat_color,
                 description=row.get("description", ""),
+                free_text=t("free"),
+                image_data_uri=img_uri,
             ), unsafe_allow_html=True)
 
             col_spacer, col_remove = st.columns([5, 1])

@@ -239,12 +239,20 @@ def render_section_header(title: str, subtitle: str = ""):
 
 def render_event_card_html(title: str, venue: str, city: str, date_str: str,
                            price: float, category: str, cat_icon: str,
-                           cat_color: str = "#6366F1", description: str = ""):
+                           cat_color: str = "#6366F1", description: str = "",
+                           free_text: str = "Free", image_data_uri: str = ""):
     """Render a premium styled event card using HTML."""
-    price_str = "Free" if price == 0 else f"{int(price)} TMT"
+    price_str = free_text if price == 0 else f"{int(price)} TMT"
     price_bg = "rgba(16, 185, 129, 0.15)" if price == 0 else "rgba(99, 102, 241, 0.15)"
     price_fg = "#10B981" if price == 0 else "#818CF8"
     desc_html = f'<p style="color: #94A3B8; font-size: 0.85rem; margin: 0.5rem 0 0 0; line-height: 1.5;">{description[:120]}{"..." if len(description) > 120 else ""}</p>' if description else ""
+
+    img_html = ""
+    if image_data_uri:
+        img_html = f'''<img src="{image_data_uri}" style="
+            width: 110px; height: 90px; object-fit: cover; border-radius: 8px;
+            flex-shrink: 0; margin-right: 1rem;
+        " alt="{title}"/>'''
 
     return f"""
     <div style="
@@ -254,6 +262,7 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
         transition: all 0.2s ease;
     ">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            {img_html}
             <div style="flex: 1;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <span style="font-size: 1.25rem;">{cat_icon}</span>

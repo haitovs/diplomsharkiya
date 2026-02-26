@@ -1,5 +1,4 @@
-# 🔧 Admin Panel - Event Discovery
-# Completely separate from user app
+# 🔧 Super Admin — Event Management System
 
 import streamlit as st
 import pandas as pd
@@ -9,22 +8,24 @@ from datetime import datetime, timedelta
 import uuid
 
 st.set_page_config(
-    page_title="Admin - Local Events",
+    page_title="Super Admin — Event Management",
     page_icon="🔧",
     layout="wide"
 )
 
 from components.styles import inject_custom_css
-from utils.i18n import t, render_language_selector
+from utils.i18n import t, t_cat, render_language_selector
 inject_custom_css()
 render_language_selector()
 
 # ============ Config ============
 DATA_PATH = pathlib.Path(__file__).parent.parent.parent / "data" / "events.json"
+IMG_DIR = pathlib.Path(__file__).parent.parent.parent / "data" / "images"
 ADMIN_PASSWORD = "admin"
 
 CITIES = ["Ashgabat", "Mary", "Türkmenabat", "Dashoguz", "Balkanabat", "Awaza"]
-CATEGORIES = ["Music", "Tech", "Sports", "Food", "Art", "Market", "Film", "Wellness", "Business", "Science", "Kids", "Travel", "Community"]
+CATEGORIES = ["Music", "Tech", "Sports", "Food", "Art", "Market", "Film",
+              "Wellness", "Business", "Science", "Kids", "Travel", "Community"]
 
 CITY_COORDS = {
     "Ashgabat": (37.9601, 58.3261),
@@ -35,39 +36,14 @@ CITY_COORDS = {
     "Awaza": (40.0224, 52.9693),
 }
 
-# ============ Auth ============
-def check_auth():
-    if "admin_auth" not in st.session_state:
-        st.session_state.admin_auth = False
-    
-    if st.session_state.admin_auth:
-        return True
-    
-    st.markdown(f"# 🔐 {t('admin_login')}")
-    
-    with st.form("login"):
-        username = st.text_input("Username")
-        password = st.text_input(t("password"), type="password")
-        submit = st.form_submit_button(t("login"), use_container_width=True)
-        
-        if submit:
-            if username == "admin" and password == ADMIN_PASSWORD:
-                st.session_state.admin_auth = True
-                st.session_state.admin_user = username
-                st.rerun()
-            else:
-                st.error("❌ Invalid credentials")
-    
-    return False
-
-# ============ Data Functions ============
+# ============ Data helpers ============
 def load_events():
     if not DATA_PATH.exists():
         return []
     try:
         with open(DATA_PATH, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
+    except Exception:
         return []
 
 def save_events(events):
@@ -77,270 +53,265 @@ def save_events(events):
 def generate_id():
     return f"evt{uuid.uuid4().hex[:6]}"
 
-# ============ Main App ============
+# ============ Auth ============
+def check_auth():
+    if "admin_auth" not in st.session_state:
+        st.session_state.admin_auth = False
+
+    if st.session_state.admin_auth:
+        return True
+
+    # ─── Super Admin Login Screen ─────────────────
+    st.markdown("""
+    <div style="
+        max-width: 420px; margin: 4rem auto; padding: 2.5rem;
+        background: linear-gradient(135deg, #141B34 0%, #1A2238 100%);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+        text-align: center;
+    ">
+        <p style="font-size: 2.5rem; margin-bottom: 0.25rem;">🔐</p>
+        <h2 style="color: #F8FAFC; margin: 0 0 0.25rem 0; font-weight: 700;">""" + t("super_admin") + """</h2>
+        <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 1.5rem;">""" + t("admin_access_desc") + """</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.form("login"):
+        col_l, col_c, col_r = st.columns([1, 2, 1])
+        with col_c:
+            username = st.text_input(t("username"), placeholder="admin")
+            password = st.text_input(t("password"), type="password")
+            submit = st.form_submit_button(f"🔑 {t('login')}", use_container_width=True)
+
+            if submit:
+                if username == "admin" and password == ADMIN_PASSWORD:
+                    st.session_state.admin_auth = True
+                    st.session_state.admin_user = username
+                    st.rerun()
+                else:
+                    st.error(f"❌ {t('invalid_credentials')}")
+
+    return False
+
+# ============ Main ============
 if not check_auth():
     st.stop()
 
-# Custom CSS
-st.markdown("""
-<style>
-.admin-stat {
-    background: linear-gradient(135deg, #1E293B, #334155);
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    color: white;
-}
-.admin-stat h2 { color: #10B981; margin: 0; }
-.admin-stat p { color: #94A3B8; margin: 0; }
-</style>
-""", unsafe_allow_html=True)
-
-# Load data
 events = load_events()
-df = pd.DataFrame(events) if events else pd.DataFrame()
 
-# Header
-col1, col2, col3 = st.columns([2, 1, 1])
-with col1:
-    st.markdown(f"# 🔧 {t('admin_title')}")
-with col2:
-    st.caption(f"👤 Logged in as: **{st.session_state.get('admin_user', 'admin')}**")
-with col3:
+# ─── Header ───────────────────────────────────────
+col_title, col_user, col_logout = st.columns([3, 1, 1])
+with col_title:
+    st.markdown(f"# 🛡️ {t('super_admin')} — {t('event_management_system')}")
+with col_user:
+    st.caption(f"👤 {t('logged_in_as')}: **{st.session_state.get('admin_user', 'admin')}**")
+with col_logout:
     if st.button(f"🚪 {t('logout')}", use_container_width=True):
         st.session_state.admin_auth = False
         st.rerun()
 
 st.divider()
 
-# Tabs
-tabs = st.tabs(["📊 Dashboard", "📝 Manage Events", "➕ Add Event", "📥 Import/Export"])
+# ─── Two Tabs: Events | Settings ──────────────────
+tab_events, tab_settings = st.tabs([
+    f"📋 {t('manage_events_tab')}",
+    f"⚙️ {t('settings_tab')}",
+])
 
-# ============ Tab 1: Dashboard ============
-with tabs[0]:
-    st.subheader("📊 Dashboard")
-    
-    # Stats
+# ═════════════════ TAB 1: Events ═════════════════
+with tab_events:
+    # --- Dashboard stats ---
     total = len(events)
     cities = len(set(e.get("city", "") for e in events)) if events else 0
-    free = len([e for e in events if e.get("price", 0) == 0])
-    categories = len(set(e.get("category", "") for e in events)) if events else 0
-    
-    cols = st.columns(4)
-    with cols[0]:
-        st.metric("Total Events", total)
-    with cols[1]:
-        st.metric("Cities", cities)
-    with cols[2]:
-        st.metric("Free Events", free)
-    with cols[3]:
-        st.metric("Categories", categories)
-    
-    st.divider()
-    
-    # Events by category (simple bar)
-    if events:
-        st.markdown("#### 📊 Events by Category")
-        cat_counts = {}
-        for e in events:
-            cat = e.get("category", "Other")
-            cat_counts[cat] = cat_counts.get(cat, 0) + 1
-        
-        for cat, count in sorted(cat_counts.items(), key=lambda x: -x[1]):
-            st.progress(count / total, text=f"{cat}: {count}")
-        
-        st.divider()
-        
-        # Events by city
-        st.markdown("#### 📍 Events by City")
-        city_counts = {}
-        for e in events:
-            city = e.get("city", "Unknown")
-            city_counts[city] = city_counts.get(city, 0) + 1
-        
-        for city, count in sorted(city_counts.items(), key=lambda x: -x[1]):
-            st.progress(count / total, text=f"{city}: {count}")
-    else:
-        st.info("No events yet. Add some events to see statistics.")
+    free_count = len([e for e in events if e.get("price", 0) == 0])
+    cat_count = len(set(e.get("category", "") for e in events)) if events else 0
 
-# ============ Tab 2: Manage Events ============
-with tabs[1]:
-    st.subheader("📝 Manage Events")
-    
-    # Filters
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        admin_city = st.selectbox("Filter City", ["All"] + CITIES, key="admin_filter_city")
-    with col2:
-        admin_cat = st.selectbox("Filter Category", ["All"] + CATEGORIES, key="admin_filter_cat")
-    with col3:
-        admin_search = st.text_input("Search", key="admin_search")
-    
-    # Filter events
-    # Default Sort: Latest first (Reverse order of list)
-    # We create a display list, reversing the original events list which is usually chronological if appended
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.metric(f"📊 {t('total_events')}", total)
+    with c2:
+        st.metric(f"🏙️ {t('cities_covered')}", cities)
+    with c3:
+        st.metric(f"🆓 {t('free_events')}", free_count)
+    with c4:
+        st.metric(f"🏷️ {t('categories_count')}", cat_count)
+
+    st.divider()
+
+    # --- Filters ---
+    col_f1, col_f2, col_f3 = st.columns(3)
+    with col_f1:
+        admin_city = st.selectbox(
+            t("filter_city"),
+            [t("all")] + CITIES,
+            key="admin_filter_city"
+        )
+    with col_f2:
+        admin_cat = st.selectbox(
+            t("filter_category"),
+            [t("all")] + [t_cat(c) for c in CATEGORIES],
+            key="admin_filter_cat"
+        )
+    with col_f3:
+        admin_search = st.text_input(t("search"), key="admin_search")
+
+    # Map translated category back to internal name
+    cat_label_to_key = {t_cat(c): c for c in CATEGORIES}
+
     display_events = events[::-1]
-    
-    if admin_city != "All":
+    if admin_city != t("all"):
         display_events = [e for e in display_events if e.get("city") == admin_city]
-    if admin_cat != "All":
-        display_events = [e for e in display_events if e.get("category") == admin_cat]
+    if admin_cat != t("all"):
+        internal_cat = cat_label_to_key.get(admin_cat, admin_cat)
+        display_events = [e for e in display_events if e.get("category") == internal_cat]
     if admin_search:
-        display_events = [e for e in display_events if admin_search.lower() in e.get("title", "").lower()]
-    
-    st.caption(f"Showing {len(display_events)} of {len(events)} events")
-    
+        display_events = [e for e in display_events
+                          if admin_search.lower() in e.get("title", "").lower()]
+
+    st.caption(t("showing_of", count=len(display_events), total=len(events)))
+
+    # --- Event list ---
     if not display_events:
-        st.info("No events found")
+        st.info(t("no_events_found"))
     else:
         for event in display_events:
-            with st.expander(f"📌 {event.get('title', 'Untitled')} — {event.get('city', '')} ({event.get('category', '')})"):
-                col1, col2 = st.columns(2)
-                
-                with col1:
+            price = event.get("price", 0)
+            price_str = t("free") if price == 0 else f"{int(price)} TMT"
+            cat_display = t_cat(event.get("category", ""))
+
+            with st.expander(
+                f"{cat_display} · **{event.get('title', 'Untitled')}** — "
+                f"{event.get('city', '')} · {price_str}"
+            ):
+                col_info, col_actions = st.columns([3, 1])
+
+                with col_info:
                     st.markdown(f"**ID:** `{event.get('id', 'N/A')}`")
-                    st.markdown(f"**Venue:** {event.get('venue', 'N/A')}")
-                    st.markdown(f"**Date:** {event.get('date_start', 'N/A')}")
-                    st.markdown(f"**Price:** {event.get('price', 0)} TMT")
-                    st.markdown(f"**Popularity:** {event.get('popularity', 50)}%")
-                
-                with col2:
-                    st.markdown("**Description:**")
-                    st.write(event.get("description", "No description"))
-                    if event.get("lat") and event.get("lon"):
-                        st.caption(f"📍 {event['lat']:.4f}, {event['lon']:.4f}")
-                
-                # Actions
-                act_cols = st.columns(3)
-                with act_cols[0]:
-                    if st.button("📋 Duplicate", key=f"dup_{event['id']}", use_container_width=True):
+                    st.markdown(f"**{t('venue_label')}:** {event.get('venue', 'N/A')}")
+                    st.markdown(f"**{t('event_date')}:** {event.get('date_start', 'N/A')}")
+                    st.markdown(f"**{t('price_label')}:** {price_str}")
+                    if event.get("description"):
+                        st.markdown(f"**{t('event_description')}:** {event['description'][:200]}")
+
+                with col_actions:
+                    if st.button(f"📋 {t('duplicate')}", key=f"dup_{event['id']}",
+                                 use_container_width=True):
                         new_event = event.copy()
                         new_event["id"] = generate_id()
                         new_event["title"] = f"{event['title']} (Copy)"
                         events.append(new_event)
                         save_events(events)
-                        st.success("✅ Duplicated!")
                         st.rerun()
-                
-                with act_cols[1]:
-                    with st.expander("✏️ Edit"):
-                        with st.form(key=f"edit_{event['id']}"):
-                            e_title = st.text_input("Title", value=event.get("title", ""))
-                            e_venue = st.text_input("Venue", value=event.get("venue", ""))
-                            e_price = st.number_input("Price", value=float(event.get("price", 0)))
-                            e_desc = st.text_area("Description", value=event.get("description", ""))
-                            
-                            # Icon edit
-                            e_icon = st.selectbox("Icon", ["Default", "music", "art", "tech", "sports", "business"], 
-                                                index=["Default", "music", "art", "tech", "sports", "business"].index(event.get("icon", "Default")) if event.get("icon") in ["music", "art", "tech", "sports", "business"] else 0)
-                            
-                            if st.form_submit_button("💾 Save"):
-                                for i, e in enumerate(events):
-                                    if e["id"] == event["id"]:
-                                        events[i]["title"] = e_title
-                                        events[i]["venue"] = e_venue
-                                        events[i]["price"] = e_price
-                                        events[i]["description"] = e_desc
-                                        if e_icon != "Default":
-                                            events[i]["icon"] = e_icon
-                                        break
-                                save_events(events)
-                                st.success("Saved!")
-                                st.rerun()
-                
-                with act_cols[2]:
-                    if st.button("🗑️ Delete", key=f"del_{event['id']}", use_container_width=True, type="secondary"):
+
+                    if st.button(f"🗑️ {t('delete')}", key=f"del_{event['id']}",
+                                 use_container_width=True):
                         events = [e for e in events if e.get("id") != event["id"]]
                         save_events(events)
-                        st.success("🗑️ Deleted!")
                         st.rerun()
 
-# ============ Tab 3: Add Event ============
-with tabs[2]:
-    st.subheader("➕ Add New Event")
-    
+                # Edit form (clean, flat)
+                st.markdown(f"##### ✏️ {t('edit')}")
+                with st.form(key=f"edit_{event['id']}"):
+                    ec1, ec2 = st.columns(2)
+                    with ec1:
+                        e_title = st.text_input(t("title_field"), value=event.get("title", ""))
+                        e_venue = st.text_input(t("venue_label"), value=event.get("venue", ""))
+                        e_city = st.selectbox(t("event_city"), CITIES,
+                                              index=CITIES.index(event.get("city", "Ashgabat"))
+                                              if event.get("city") in CITIES else 0)
+                        e_cat = st.selectbox(t("event_category"), CATEGORIES,
+                                             index=CATEGORIES.index(event.get("category", "Music"))
+                                             if event.get("category") in CATEGORIES else 0)
+                    with ec2:
+                        e_price = st.number_input(t("price_label"), value=float(event.get("price", 0)),
+                                                  min_value=0.0, step=5.0)
+                        e_pop = st.slider(t("popularity"), 1, 100,
+                                          int(event.get("popularity", 50)))
+                        e_desc = st.text_area(t("event_description"),
+                                              value=event.get("description", ""), height=100)
+
+                    if st.form_submit_button(f"💾 {t('save')}", use_container_width=True):
+                        for i, e in enumerate(events):
+                            if e["id"] == event["id"]:
+                                events[i]["title"] = e_title
+                                events[i]["venue"] = e_venue
+                                events[i]["city"] = e_city
+                                events[i]["category"] = e_cat
+                                events[i]["price"] = e_price
+                                events[i]["popularity"] = e_pop
+                                events[i]["description"] = e_desc
+                                lat, lon = CITY_COORDS.get(e_city, (37.9601, 58.3261))
+                                events[i]["lat"] = lat
+                                events[i]["lon"] = lon
+                                break
+                        save_events(events)
+                        st.success(f"✅ {t('save')}")
+                        st.rerun()
+
+    # --- Add New Event form ---
+    st.divider()
+    st.markdown(f"### ➕ {t('add_event')}")
+
     with st.form("add_event"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            title = st.text_input("Title *", placeholder="Event name")
-            category = st.selectbox("Category *", CATEGORIES)
-            city = st.selectbox("City *", CITIES)
-            venue = st.text_input("Venue *", placeholder="Location name")
-            price = st.number_input("Price (TMT)", min_value=0.0, step=5.0, value=0.0)
-        
-        with col2:
-            date_start = st.date_input("Start Date *", value=datetime.now().date() + timedelta(days=7))
-            time_start = st.time_input("Start Time *", value=datetime.strptime("18:00", "%H:%M").time())
-            date_end = st.date_input("End Date *", value=datetime.now().date() + timedelta(days=7))
-            time_end = st.time_input("End Time *", value=datetime.strptime("21:00", "%H:%M").time())
-            popularity = st.slider("Popularity", 1, 100, 50)
-        
-        # Location
-        st.markdown("**📍 Location Coordinates**")
-        loc_cols = st.columns(3)
-        with loc_cols[0]:
-            use_city_coords = st.checkbox("Use city center", value=True)
-        with loc_cols[1]:
-            default_lat = CITY_COORDS.get(city, (37.9601, 58.3261))[0]
-            lat = st.number_input("Latitude", value=default_lat if use_city_coords else 37.9601, format="%.4f")
-        with loc_cols[2]:
-            default_lon = CITY_COORDS.get(city, (37.9601, 58.3261))[1]
-            lon = st.number_input("Longitude", value=default_lon if use_city_coords else 58.3261, format="%.4f")
-        
-        
-        # Icon Selection
-        # CWD is src/, so path is assets/icons
-        icon_path = pathlib.Path("assets/icons")
-        available_icons = ["Default"]
-        if icon_path.exists():
-            available_icons += [f.stem for f in icon_path.glob("*.png")]
-            
-        icon_choice = st.selectbox("Select Icon", available_icons)
-        
-        description = st.text_area(t("event_description"), placeholder="Event description...")
-        
-        submit = st.form_submit_button(f"➕ {t('add_event')}", use_container_width=True, type="primary")
-        
+        ac1, ac2 = st.columns(2)
+
+        with ac1:
+            new_title = st.text_input(f"{t('title_field')} *", placeholder="Event name")
+            new_cat = st.selectbox(f"{t('event_category')} *", CATEGORIES, key="new_cat")
+            new_city = st.selectbox(f"{t('event_city')} *", CITIES, key="new_city")
+            new_venue = st.text_input(f"{t('venue_label')} *", placeholder="Location name")
+            new_price = st.number_input(t("event_price"), min_value=0.0, step=5.0, value=0.0)
+
+        with ac2:
+            new_date_start = st.date_input(f"{t('start_date')} *",
+                                           value=datetime.now().date() + timedelta(days=7))
+            new_time_start = st.time_input(f"{t('start_time')} *",
+                                           value=datetime.strptime("18:00", "%H:%M").time())
+            new_date_end = st.date_input(f"{t('end_date')} *",
+                                         value=datetime.now().date() + timedelta(days=7))
+            new_time_end = st.time_input(f"{t('end_time')} *",
+                                         value=datetime.strptime("21:00", "%H:%M").time())
+            new_pop = st.slider(t("popularity"), 1, 100, 50, key="new_pop")
+
+        new_desc = st.text_area(t("event_description"), placeholder="...", key="new_desc")
+
+        submit = st.form_submit_button(f"➕ {t('add_event')}", use_container_width=True,
+                                       type="primary")
         if submit:
-            if not title or not venue:
-                st.error("⚠️ Please fill in required fields")
+            if not new_title or not new_venue:
+                st.error(f"⚠️ {t('fill_required')}")
             else:
-                layout_icon = ""
-                if icon_choice != "Default":
-                    layout_icon = icon_choice
-                
+                lat, lon = CITY_COORDS.get(new_city, (37.9601, 58.3261))
                 new_event = {
                     "id": generate_id(),
-                    "title": title,
-                    "category": category,
-                    "city": city,
-                    "venue": venue,
-                    "date_start": datetime.combine(date_start, time_start).isoformat(),
-                    "date_end": datetime.combine(date_end, time_end).isoformat(),
-                    "price": price,
-                    "popularity": popularity,
+                    "title": new_title,
+                    "category": new_cat,
+                    "city": new_city,
+                    "venue": new_venue,
+                    "date_start": datetime.combine(new_date_start, new_time_start).isoformat(),
+                    "date_end": datetime.combine(new_date_end, new_time_end).isoformat(),
+                    "price": new_price,
+                    "popularity": new_pop,
                     "lat": lat,
                     "lon": lon,
-                    "image": "",
-                    "icon": layout_icon, 
-                    "description": description,
+                    "image": "images/event_default.jpg",
+                    "icon": "",
+                    "description": new_desc,
                 }
-                
                 events.append(new_event)
                 save_events(events)
-                st.success(f"✅ Event '{title}' added successfully!")
+                st.success(f"✅ {t('event_added')}")
                 st.balloons()
 
-    # ─── Image Upload (outside form) ─────────────────────────
+    # --- Image Upload ---
     st.divider()
     st.markdown(f"### 🖼️ {t('upload_image')}")
-    st.caption("Upload images for events. They will be saved in data/images/ and linked to the selected event.")
 
     if events:
         event_titles = {e["id"]: e.get("title", "Untitled") for e in events}
         selected_event_id = st.selectbox(
-            "Select event to add image",
+            t("event_title"),
             options=list(event_titles.keys()),
             format_func=lambda x: event_titles[x],
             key="img_event_select"
@@ -354,131 +325,84 @@ with tabs[2]:
 
         if uploaded_img and selected_event_id:
             if st.button(f"💾 {t('save')}", key="save_img", type="primary"):
-                img_dir = pathlib.Path(__file__).parent.parent.parent / "data" / "images"
-                img_dir.mkdir(parents=True, exist_ok=True)
-
+                IMG_DIR.mkdir(parents=True, exist_ok=True)
                 ext = uploaded_img.name.split(".")[-1]
                 img_filename = f"{selected_event_id}.{ext}"
-                img_path = img_dir / img_filename
+                img_path = IMG_DIR / img_filename
 
                 with open(img_path, "wb") as f:
                     f.write(uploaded_img.getbuffer())
 
-                # Update event in the list
                 for e in events:
                     if e["id"] == selected_event_id:
                         e["image"] = f"images/{img_filename}"
                         break
-
                 save_events(events)
-                st.success(f"✅ Image saved for event: {event_titles[selected_event_id]}")
+                st.success(f"✅ {t('save')}")
                 st.image(str(img_path), width=300)
     else:
         st.info(t("no_events"))
 
-# ============ Tab 4: Import/Export ============
-with tabs[3]:
-    st.subheader("📥 Import / Export")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("#### 📤 Export Events")
-        
+# ═════════════════ TAB 2: Settings ═════════════════
+with tab_settings:
+    col_exp, col_imp = st.columns(2)
+
+    with col_exp:
+        st.markdown(f"#### 📤 {t('export_events')}")
         if events:
             json_str = json.dumps(events, indent=2, ensure_ascii=False)
             st.download_button(
-                "⬇️ Download JSON",
+                f"⬇️ {t('download_json')}",
                 data=json_str,
                 file_name=f"events_{datetime.now().strftime('%Y%m%d')}.json",
                 mime="application/json",
                 use_container_width=True
             )
-            st.caption(f"{len(events)} events ready for export")
+            st.caption(f"{len(events)} {t('events_found')}")
         else:
-            st.info("No events to export")
-    
-    with col2:
-        st.markdown("#### 📥 Import Events")
-        
-        uploaded = st.file_uploader("Upload JSON", type=["json"])
-        
+            st.info(t("no_events"))
+
+    with col_imp:
+        st.markdown(f"#### 📥 {t('import_events')}")
+        uploaded = st.file_uploader(t("upload_json"), type=["json"])
+
         if uploaded:
             try:
                 content = uploaded.read().decode("utf-8")
                 new_events = json.loads(content)
-                
                 if isinstance(new_events, list):
-                    st.success(f"Found {len(new_events)} events")
-                    
-                    if st.button("📥 Import", use_container_width=True, type="primary"):
+                    st.success(f"{len(new_events)} {t('events_found')}")
+                    if st.button(f"📥 {t('import_btn')}", use_container_width=True,
+                                 type="primary"):
                         existing_ids = {e.get("id") for e in events}
                         added = 0
                         for e in new_events:
                             if e.get("id") not in existing_ids:
                                 events.append(e)
                                 added += 1
-                        
                         save_events(events)
-                        st.success(f"✅ Imported {added} new events!")
+                        st.success(f"✅ +{added}")
                         st.rerun()
                 else:
-                    st.error("Invalid format - expected array")
-            except Exception as e:
-                st.error(f"Error: {e}")
-    
+                    st.error("Invalid format — expected array")
+            except Exception as ex:
+                st.error(f"Error: {ex}")
+
     st.divider()
-    
-    # ============ Maintenance ============
-    st.markdown("#### 🛠️ Maintenance")
-    with st.expander("🎨 Auto-Assign Icons"):
-        st.info("This will assign icons to events based on their category (e.g., 'Music' -> 'music.png').")
-        if st.button("🚀 Run Auto-Assign", type="primary"):
-            updated_count = 0
-            icon_path = pathlib.Path("assets/icons")
-            if not icon_path.exists():
-                st.error("Assets folder not found!")
-            else:
-                available_icons = {f.stem.lower(): f.stem for f in icon_path.glob("*.png")}
-                
-                for e in events:
-                    cat = e.get("category", "").lower()
-                    current_icon = e.get("icon", "")
-                    
-                    # Mapping logic
-                    assigned = ""
-                    if cat in available_icons:
-                        assigned = available_icons[cat]
-                    elif "music" in cat: assigned = "music"
-                    elif "art" in cat: assigned = "art"
-                    elif "tech" in cat: assigned = "tech"
-                    elif "sport" in cat: assigned = "sports"
-                    
-                    if assigned and not current_icon:
-                        e["icon"] = assigned
-                        updated_count += 1
-                
-                if updated_count > 0:
-                    save_events(events)
-                    st.success(f"✅ Assigned icons to {updated_count} events!")
-                    st.rerun()
-                else:
-                    st.warning("No events needed updates (or no matching icons found).")
-    
-    # Danger zone
-    st.markdown("#### ⚠️ Danger Zone")
-    with st.expander("🗑️ Delete All Events"):
-        st.warning("This cannot be undone!")
-        confirm = st.text_input("Type 'DELETE' to confirm")
-        
-        if st.button("🗑️ Delete All", type="secondary"):
+
+    # ─── Danger Zone ──────────────────────────────
+    st.markdown(f"#### ⚠️ {t('danger_zone')}")
+    with st.expander(f"🗑️ {t('delete_all')}"):
+        st.warning(t("cannot_be_undone"))
+        confirm = st.text_input(t("confirm_delete"))
+        if st.button(f"🗑️ {t('delete_all')}", type="secondary"):
             if confirm == "DELETE":
                 save_events([])
-                st.success("All events deleted")
+                st.success("✅")
                 st.rerun()
             else:
-                st.error("Type 'DELETE' to confirm")
+                st.error(t("confirm_delete"))
 
 # Footer
 st.divider()
-st.caption("🔧 Admin Panel v2.0")
+st.caption(f"🛡️ {t('super_admin')} v3.0")

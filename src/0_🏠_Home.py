@@ -1,7 +1,8 @@
 import streamlit as st
 from state_manager import get_state
 from components.styles import inject_custom_css, render_hero, render_section_header, render_event_card_html, get_category_color_hex
-from utils.i18n import t, render_language_selector
+from utils.i18n import t, t_cat, render_language_selector
+from utils.data_loader import get_event_image_base64
 
 # Page Config
 st.set_page_config(
@@ -88,8 +89,7 @@ if not df.empty:
             except Exception:
                 date_str = str(start)
 
-        price = row.get("price", 0)
-        price_display = t("free") if price == 0 else f"{price} TMT"
+        img_uri = get_event_image_base64(row.get("image", ""))
 
         st.markdown(render_event_card_html(
             title=row.get("title", "Untitled"),
@@ -97,10 +97,12 @@ if not df.empty:
             city=row.get("city", "Unknown"),
             date_str=date_str,
             price=row.get("price", 0),
-            category=cat,
+            category=t_cat(cat),
             cat_icon=cat_icon,
             cat_color=cat_color,
             description=row.get("description", ""),
+            free_text=t("free"),
+            image_data_uri=img_uri,
         ), unsafe_allow_html=True)
 else:
     st.info(t("no_events"))

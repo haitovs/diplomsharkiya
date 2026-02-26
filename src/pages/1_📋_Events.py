@@ -1,7 +1,7 @@
 import streamlit as st
-from utils.data_loader import load_data
+from utils.data_loader import load_data, get_event_image_base64
 from utils.filters import apply_filters
-from utils.i18n import t, render_language_selector
+from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
 from components.styles import (
     inject_custom_css, render_section_header,
@@ -55,14 +55,14 @@ with st.sidebar:
         t("filter_by_category"), cat_options, default=state.filters.categories
     )
 
-    # Date
-    date_options = ["All", "Today", "This Week", "This Month"]
-    state.filters.date_preset = st.selectbox(
-        t("event_date"),
-        date_options,
-        index=date_options.index(state.filters.date_preset)
-        if state.filters.date_preset in date_options else 0
+    # Date — translate labels but map back to internal English values
+    date_keys = ["All", "Today", "This Week", "This Month"]
+    date_labels = [t("all"), t("today"), t("this_week"), t("this_month")]
+    current_idx = date_keys.index(state.filters.date_preset) if state.filters.date_preset in date_keys else 0
+    selected_date_label = st.selectbox(
+        t("event_date"), date_labels, index=current_idx
     )
+    state.filters.date_preset = date_keys[date_labels.index(selected_date_label)]
 
     # Price
     if "price" in df.columns:
@@ -71,7 +71,7 @@ with st.sidebar:
             t("event_price"), 0, max_p, state.filters.max_price
         )
 
-    if st.button(f"🗑️ {t('cancel')}", type="primary", use_container_width=True):
+    if st.button(f"🗑️ {t('reset_filters')}", type="primary", use_container_width=True):
         state.reset_filters()
         st.rerun()
 
@@ -101,16 +101,20 @@ else:
             except Exception:
                 date_str = str(start)
 
+        img_uri = get_event_image_base64(row.get("image", ""))
+
         st.markdown(render_event_card_html(
             title=row.get("title", "Untitled"),
             venue=row.get("venue", "TBA"),
             city=row.get("city", "Unknown"),
             date_str=date_str,
             price=row.get("price", 0),
-            category=cat,
+            category=t_cat(cat),
             cat_icon=cat_icon,
             cat_color=cat_color,
             description=row.get("description", ""),
+            free_text=t("free"),
+            image_data_uri=img_uri,
         ), unsafe_allow_html=True)
 
         # Save button — tight to card, right-aligned

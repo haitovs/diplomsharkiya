@@ -360,6 +360,277 @@ TRANSLATIONS = {
         "ru": "Популярность",
         "tk": "Meşhurlyk",
     },
+
+    # ─── Date Filter Presets ─────────────────────
+    "all": {
+        "en": "All",
+        "ru": "Все",
+        "tk": "Hemmesi",
+    },
+    "today": {
+        "en": "Today",
+        "ru": "Сегодня",
+        "tk": "Şu gün",
+    },
+    "this_week": {
+        "en": "This Week",
+        "ru": "Эта неделя",
+        "tk": "Şu hepde",
+    },
+    "this_month": {
+        "en": "This Month",
+        "ru": "Этот месяц",
+        "tk": "Şu aý",
+    },
+
+    # ─── Admin Panel Extras ──────────────────────
+    "super_admin": {
+        "en": "Super Admin",
+        "ru": "Супер Админ",
+        "tk": "Baş Dolandyryjy",
+    },
+    "event_management_system": {
+        "en": "Event Management System",
+        "ru": "Система управления событиями",
+        "tk": "Çäreleri dolandyryş ulgamy",
+    },
+    "admin_access_desc": {
+        "en": "Administrative access for event management",
+        "ru": "Административный доступ для управления событиями",
+        "tk": "Çäreleri dolandyrmak üçin dolandyryjy girişi",
+    },
+    "dashboard": {
+        "en": "Dashboard",
+        "ru": "Панель",
+        "tk": "Dolandyryş paneli",
+    },
+    "manage_events_tab": {
+        "en": "Manage Events",
+        "ru": "Управление",
+        "tk": "Dolandyr",
+    },
+    "add_event_tab": {
+        "en": "Add Event",
+        "ru": "Добавить",
+        "tk": "Goş",
+    },
+    "settings_tab": {
+        "en": "Settings",
+        "ru": "Настройки",
+        "tk": "Sazlamalar",
+    },
+    "total_events": {
+        "en": "Total Events",
+        "ru": "Всего событий",
+        "tk": "Jemi çäreler",
+    },
+    "free_events": {
+        "en": "Free Events",
+        "ru": "Бесплатные",
+        "tk": "Mugt çäreler",
+    },
+    "categories_count": {
+        "en": "Categories",
+        "ru": "Категории",
+        "tk": "Kategoriýalar",
+    },
+    "events_by_category": {
+        "en": "Events by Category",
+        "ru": "События по категориям",
+        "tk": "Kategoriýa boýunça çäreler",
+    },
+    "events_by_city": {
+        "en": "Events by City",
+        "ru": "События по городам",
+        "tk": "Şäher boýunça çäreler",
+    },
+    "duplicate": {
+        "en": "Duplicate",
+        "ru": "Дублировать",
+        "tk": "Göçür",
+    },
+    "edit": {
+        "en": "Edit",
+        "ru": "Редактировать",
+        "tk": "Üýtget",
+    },
+    "delete": {
+        "en": "Delete",
+        "ru": "Удалить",
+        "tk": "Poz",
+    },
+    "delete_all": {
+        "en": "Delete All Events",
+        "ru": "Удалить все события",
+        "tk": "Ähli çäreleri poz",
+    },
+    "confirm_delete": {
+        "en": "Type 'DELETE' to confirm",
+        "ru": "Введите 'DELETE' для подтверждения",
+        "tk": "Tassyklamak üçin 'DELETE' ýazyň",
+    },
+    "danger_zone": {
+        "en": "Danger Zone",
+        "ru": "Опасная зона",
+        "tk": "Howply zona",
+    },
+    "title_field": {
+        "en": "Title",
+        "ru": "Название",
+        "tk": "Ady",
+    },
+    "venue_label": {
+        "en": "Venue",
+        "ru": "Место",
+        "tk": "Ýer",
+    },
+    "price_label": {
+        "en": "Price",
+        "ru": "Цена",
+        "tk": "Baha",
+    },
+    "start_date": {
+        "en": "Start Date",
+        "ru": "Дата начала",
+        "tk": "Başlanýan senesi",
+    },
+    "end_date": {
+        "en": "End Date",
+        "ru": "Дата окончания",
+        "tk": "Gutarýan senesi",
+    },
+    "start_time": {
+        "en": "Start Time",
+        "ru": "Время начала",
+        "tk": "Başlanýan wagty",
+    },
+    "end_time": {
+        "en": "End Time",
+        "ru": "Время окончания",
+        "tk": "Gutarýan wagty",
+    },
+    "showing_of": {
+        "en": "Showing {count} of {total} events",
+        "ru": "Показано {count} из {total} событий",
+        "tk": "{total} çäreden {count} görkezilýär",
+    },
+    "filter_city": {
+        "en": "Filter City",
+        "ru": "Фильтр по городу",
+        "tk": "Şäher süzgüji",
+    },
+    "filter_category": {
+        "en": "Filter Category",
+        "ru": "Фильтр по категории",
+        "tk": "Kategoriýa süzgüji",
+    },
+    "search": {
+        "en": "Search",
+        "ru": "Поиск",
+        "tk": "Gözleg",
+    },
+    "no_events_found": {
+        "en": "No events found",
+        "ru": "События не найдены",
+        "tk": "Çäre tapylmady",
+    },
+    "logged_in_as": {
+        "en": "Logged in as",
+        "ru": "Вошли как",
+        "tk": "Girildi",
+    },
+    "invalid_credentials": {
+        "en": "Invalid credentials",
+        "ru": "Неверные данные",
+        "tk": "Nädogry maglumatlar",
+    },
+    "event_added": {
+        "en": "Event added successfully!",
+        "ru": "Событие успешно добавлено!",
+        "tk": "Çäre üstünlikli goşuldy!",
+    },
+    "fill_required": {
+        "en": "Please fill in required fields",
+        "ru": "Заполните обязательные поля",
+        "tk": "Zerur meýdanlary dolduryň",
+    },
+    "use_city_center": {
+        "en": "Use city center",
+        "ru": "Центр города",
+        "tk": "Şäher merkezi",
+    },
+    "location_coords": {
+        "en": "Location Coordinates",
+        "ru": "Координаты",
+        "tk": "Koordinatalar",
+    },
+    "export_events": {
+        "en": "Export Events",
+        "ru": "Экспорт событий",
+        "tk": "Çäreleri eksport et",
+    },
+    "import_events": {
+        "en": "Import Events",
+        "ru": "Импорт событий",
+        "tk": "Çäreleri import et",
+    },
+    "download_json": {
+        "en": "Download JSON",
+        "ru": "Скачать JSON",
+        "tk": "JSON ýükle",
+    },
+    "upload_json": {
+        "en": "Upload JSON",
+        "ru": "Загрузить JSON",
+        "tk": "JSON ýükle",
+    },
+    "import_btn": {
+        "en": "Import",
+        "ru": "Импорт",
+        "tk": "Import",
+    },
+    "cannot_be_undone": {
+        "en": "This cannot be undone!",
+        "ru": "Это действие необратимо!",
+        "tk": "Bu hereketi yzyna gaýtaryp bolmaýar!",
+    },
+    "username": {
+        "en": "Username",
+        "ru": "Имя пользователя",
+        "tk": "Ulanyjy ady",
+    },
+    "map_note": {
+        "en": "Map data from OpenStreetMap",
+        "ru": "Данные карты: OpenStreetMap",
+        "tk": "Karta maglumatlary: OpenStreetMap",
+    },
+    "reset_filters": {
+        "en": "Reset Filters",
+        "ru": "Сбросить фильтры",
+        "tk": "Süzgüçleri arassala",
+    },
+    "clear_saved": {
+        "en": "Clear All Saved",
+        "ru": "Очистить сохранённые",
+        "tk": "Hemmesini arassala",
+    },
+}
+
+# ─── Category name translations ─────────────────
+CATEGORY_TRANSLATIONS = {
+    "Music": {"en": "Music", "ru": "Музыка", "tk": "Saz"},
+    "Tech": {"en": "Tech", "ru": "Технологии", "tk": "Tehnologiýa"},
+    "Sports": {"en": "Sports", "ru": "Спорт", "tk": "Sport"},
+    "Food": {"en": "Food", "ru": "Еда", "tk": "Tagam"},
+    "Art": {"en": "Art", "ru": "Искусство", "tk": "Sungat"},
+    "Market": {"en": "Market", "ru": "Рынок", "tk": "Bazar"},
+    "Film": {"en": "Film", "ru": "Кино", "tk": "Film"},
+    "Wellness": {"en": "Wellness", "ru": "Здоровье", "tk": "Saglyk"},
+    "Business": {"en": "Business", "ru": "Бизнес", "tk": "Işewürlik"},
+    "Science": {"en": "Science", "ru": "Наука", "tk": "Ylym"},
+    "Kids": {"en": "Kids", "ru": "Дети", "tk": "Çagalar"},
+    "Travel": {"en": "Travel", "ru": "Путешествия", "tk": "Syýahat"},
+    "Community": {"en": "Community", "ru": "Сообщество", "tk": "Jemgyýet"},
 }
 
 
@@ -368,11 +639,24 @@ def get_lang() -> str:
     return st.session_state.get("lang", "en")
 
 
-def t(key: str) -> str:
-    """Translate a key to the current language."""
+def t(key: str, **kwargs) -> str:
+    """Translate a key to the current language. Supports {placeholder} formatting."""
     lang = get_lang()
     entry = TRANSLATIONS.get(key, {})
-    return entry.get(lang, entry.get("en", key))
+    text = entry.get(lang, entry.get("en", key))
+    if kwargs:
+        try:
+            text = text.format(**kwargs)
+        except (KeyError, IndexError):
+            pass
+    return text
+
+
+def t_cat(category: str) -> str:
+    """Translate a category name to the current language."""
+    lang = get_lang()
+    entry = CATEGORY_TRANSLATIONS.get(category, {})
+    return entry.get(lang, category)
 
 
 def render_language_selector():
