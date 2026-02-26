@@ -59,16 +59,8 @@ else:
         center = [37.9601, 58.3261]
         zoom = 12
 
-    # OpenStreetMap as default tile layer
-    m = folium.Map(location=center, zoom_start=zoom, tiles=None)
-
-    folium.TileLayer(
-        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        name="OpenStreetMap",
-        overlay=False,
-        control=True,
-    ).add_to(m)
+    # OpenStreetMap as the selected default tile layer
+    m = folium.Map(location=center, zoom_start=zoom, tiles="OpenStreetMap")
 
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
@@ -79,6 +71,22 @@ else:
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
+
+    # Pre-cache all category images once
+    _img_cache = {}
+
+    def _get_popup_image(cat, img_path):
+        key = img_path or cat
+        if key in _img_cache:
+            return _img_cache[key]
+        path = img_path
+        if not path or path == "images/event_default.jpg":
+            path = get_category_image_path(cat)
+        uri = get_event_image_base64(path)
+        if not uri:
+            uri = get_event_image_base64("images/event_default.jpg")
+        _img_cache[key] = uri
+        return uri
 
     for _, row in filtered_df.iterrows():
         if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
@@ -109,25 +117,21 @@ else:
                     raw = str(date_val)
                     date_str = raw.split("T")[0] if "T" in raw else raw
 
-            # Get base64 image for popup (category image → default fallback)
-            img_path = row.get("image", "")
-            if not img_path or img_path == "images/event_default.jpg":
-                img_path = get_category_image_path(cat)
-            img_data_uri = get_event_image_base64(img_path)
-            if not img_data_uri:
-                img_data_uri = get_event_image_base64("images/event_default.jpg")
+            img_data_uri = _get_popup_image(cat, row.get("image", ""))
 
+            # Photo button inline next to price using <details>
             photo_details_html = ""
             if img_data_uri:
                 photo_details_html = (
-                    '<details style="margin-top:6px;">'
+                    '<details style="display:inline-block;margin:0;vertical-align:middle;">'
                     '<summary style="cursor:pointer;display:inline-block;'
                     'background:rgba(99,102,241,0.15);color:#6366F1;'
-                    'border-radius:6px;padding:2px 8px;font-size:0.75rem;'
-                    'font-weight:600;list-style:none;user-select:none;">'
-                    '\U0001f4f7 Photo</summary>'
-                    f'<img src="{img_data_uri}" style="max-height:90px;max-width:100%;'
-                    f'object-fit:cover;border-radius:6px;margin-top:4px;display:block;" />'
+                    'border-radius:6px;padding:2px 8px;font-size:0.72rem;'
+                    'font-weight:600;list-style:none;user-select:none;'
+                    'line-height:1.4;">'
+                    '\U0001f4f7</summary>'
+                    f'<img src="{img_data_uri}" style="max-height:60px;max-width:100%;'
+                    f'object-fit:cover;border-radius:4px;margin-top:4px;display:block;" />'
                     '</details>'
                 )
 
@@ -149,14 +153,14 @@ else:
                 <p style="color:#555; font-size:0.78rem; margin:0 0 6px 0;">
                     {row.get('description', '')[:80]}{'...' if len(row.get('description', '')) > 80 else ''}
                 </p>
-                <div style="display:flex; align-items:center; gap:8px;">
+                <div style="display:flex; align-items:center; gap:6px;">
                     <span style="background:{price_color}15; color:{price_color};
                         padding:3px 10px; border-radius:6px; display:inline-block;
                         font-weight:700; font-size:0.85rem;">
                         {price_str}
                     </span>
+                    {photo_details_html}
                 </div>
-                {photo_details_html}
             </div>
             """
 

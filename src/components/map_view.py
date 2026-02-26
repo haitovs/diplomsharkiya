@@ -296,14 +296,15 @@ def create_popup_html(row: pd.Series, image_data_uri: str = "") -> str:
     photo_details_html = ""
     if image_data_uri:
         photo_details_html = (
-            '<details style="margin-top:6px;">'
+            '<details style="display:inline-block;margin:0;vertical-align:middle;">'
             '<summary style="cursor:pointer;display:inline-block;'
             'background:rgba(99,102,241,0.15);color:#6366F1;'
-            'border-radius:6px;padding:2px 8px;font-size:0.75rem;'
-            'font-weight:600;list-style:none;user-select:none;">'
-            '\U0001f4f7 Photo</summary>'
-            f'<img src="{image_data_uri}" style="max-height:90px;max-width:100%;'
-            f'object-fit:cover;border-radius:6px;margin-top:4px;display:block;" />'
+            'border-radius:6px;padding:2px 8px;font-size:0.72rem;'
+            'font-weight:600;list-style:none;user-select:none;'
+            'line-height:1.4;">'
+            '\U0001f4f7</summary>'
+            f'<img src="{image_data_uri}" style="max-height:60px;max-width:100%;'
+            f'object-fit:cover;border-radius:4px;margin-top:4px;display:block;" />'
             '</details>'
         )
 
@@ -316,11 +317,11 @@ def create_popup_html(row: pd.Series, image_data_uri: str = "") -> str:
         <p style="margin: 4px 0; color: #64748B; font-size: 12px;">
             📅 {date_str}
         </p>
-        <div style="display:flex; align-items:center; gap:8px; margin: 4px 0; font-size: 12px;">
+        <div style="display:flex; align-items:center; gap:6px; margin: 4px 0; font-size: 12px;">
             <span style="background: #E2E8F0; padding: 2px 8px; border-radius: 4px;">{category}</span>
             <span style="font-weight: bold; color: #6366F1;">{price_str}</span>
+            {photo_details_html}
         </div>
-        {photo_details_html}
     </div>
     """
 

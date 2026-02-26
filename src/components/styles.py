@@ -276,7 +276,7 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
         transition: all 0.2s ease;
     ">
         <div style="display: flex; align-items: stretch;">
-            <div style="flex: 0 0 50%; max-width: 50%; min-height: 140px;">
+            <div style="flex: 0 0 30%; max-width: 30%; min-height: 110px;">
                 {img_html}
             </div>
             <div style="flex: 1; padding: 1rem 1.25rem; display: flex; flex-direction: column; justify-content: center;">

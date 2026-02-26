@@ -104,22 +104,23 @@ else:
         img_uri = get_event_image_base64(row.get("image", ""))
         is_saved = state.ui.is_saved(row.get("id"))
 
-        st.markdown(render_event_card_html(
-            title=row.get("title", "Untitled"),
-            venue=row.get("venue", "TBA"),
-            city=row.get("city", "Unknown"),
-            date_str=date_str,
-            price=row.get("price", 0),
-            category=t_cat(cat),
-            cat_icon=cat_icon,
-            cat_color=cat_color,
-            description=row.get("description", ""),
-            free_text=t("free"),
-            image_data_uri=img_uri,
-        ), unsafe_allow_html=True)
-        # Like button right-aligned under card
-        _, like_col = st.columns([20, 1])
+        card_col, like_col = st.columns([14, 1])
+        with card_col:
+            st.markdown(render_event_card_html(
+                title=row.get("title", "Untitled"),
+                venue=row.get("venue", "TBA"),
+                city=row.get("city", "Unknown"),
+                date_str=date_str,
+                price=row.get("price", 0),
+                category=t_cat(cat),
+                cat_icon=cat_icon,
+                cat_color=cat_color,
+                description=row.get("description", ""),
+                free_text=t("free"),
+                image_data_uri=img_uri,
+            ), unsafe_allow_html=True)
         with like_col:
+            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{row.get('id')}",
