@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import folium
+from branca.element import Element
 from streamlit_folium import st_folium
 from utils.data_loader import load_data, get_event_image_base64, get_category_image_path
 from utils.filters import apply_filters
@@ -18,6 +19,19 @@ df = load_data()
 state = get_state()
 
 st.title(f"🗺️ {t('map_page_title')}")
+
+st.markdown(
+    """
+    <style>
+    /* Keep map visible during Streamlit reruns (avoid blue/dim stale overlay). */
+    .st-key-mapcanvas [data-testid="stElementContainer"][data-stale="true"] {
+        opacity: 1 !important;
+        transition: none !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # --- SIDEBAR FILTERS (Compact) ---
 with st.sidebar:
@@ -59,8 +73,23 @@ else:
         center = [37.9601, 58.3261]
         zoom = 12
 
-    # OpenStreetMap as the selected default tile layer
-    m = folium.Map(location=center, zoom_start=zoom, tiles="OpenStreetMap")
+    # OpenStreetMap must be selected by default.
+    m = folium.Map(
+        location=center,
+        zoom_start=zoom,
+        tiles=None,
+        control_scale=True,
+        prefer_canvas=True,
+        fade_animation=False,
+    )
+
+    folium.TileLayer(
+        tiles="OpenStreetMap",
+        name="OpenStreetMap",
+        overlay=False,
+        control=True,
+        show=True,
+    ).add_to(m)
 
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
@@ -68,7 +97,21 @@ else:
         name="CartoDB Positron",
         overlay=False,
         control=True,
+        show=False,
     ).add_to(m)
+
+    # Use a light fallback while tiles load.
+    m.get_root().html.add_child(
+        Element(
+            """
+            <style>
+            .leaflet-container {
+                background: #f8fafc !important;
+            }
+            </style>
+            """
+        )
+    )
 
     folium.LayerControl().add_to(m)
 
@@ -172,7 +215,14 @@ else:
             ).add_to(m)
 
     try:
-        st_folium(m, width="100%", height=600)
+        with st.container(key="mapcanvas"):
+            st_folium(
+                m,
+                key="main_events_map",
+                height=600,
+                use_container_width=True,
+                returned_objects=[],
+            )
     except Exception as e:
         st.error(f"Map rendering error: {e}")
         st.info("Try refreshing the page.")
