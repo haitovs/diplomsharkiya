@@ -5,6 +5,7 @@ Interactive map with event markers and filtering
 
 import streamlit as st
 import folium
+from branca.element import Element
 from folium.plugins import Draw, MarkerCluster
 from streamlit_folium import st_folium
 import pandas as pd
@@ -55,20 +56,46 @@ def create_event_map(
         location=list(center),
         zoom_start=zoom,
         control_scale=True,
-        tiles="OpenStreetMap"
+        tiles=None,
+        prefer_canvas=True,
+        fade_animation=False,
     )
+
+    # Keep OpenStreetMap as the active default basemap.
+    folium.TileLayer(
+        tiles="OpenStreetMap",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        name="OpenStreetMap",
+        overlay=False,
+        control=True,
+        show=True,
+    ).add_to(m)
     
     # Add alternative tile layers
     folium.TileLayer(
         tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         attr="Esri",
         name="Satellite",
+        show=False,
     ).add_to(m)
     
     folium.TileLayer(
         tiles="cartodbpositron",
         name="Light Mode",
+        show=False,
     ).add_to(m)
+
+    m.get_root().html.add_child(
+        Element(
+            """
+            <style>
+            .leaflet-container {
+                background: #f8fafc !important;
+            }
+            </style>
+            """
+        )
+    )
     
     # Add layer control
     folium.LayerControl(position="topright").add_to(m)

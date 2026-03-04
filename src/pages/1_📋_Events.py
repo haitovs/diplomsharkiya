@@ -7,6 +7,7 @@ from components.styles import (
     inject_custom_css, render_section_header,
     render_event_card_html, get_category_color_hex
 )
+from components.ui_components import payment_dialog
 from config import CATEGORY_CONFIG
 
 # Page Config
@@ -103,15 +104,17 @@ else:
 
         img_uri = get_event_image_base64(row.get("image", ""))
         is_saved = state.ui.is_saved(row.get("id"))
+        event_price = row.get("price", 0)
+        event_id = row.get("id")
 
-        card_col, like_col = st.columns([14, 1])
+        card_col, buy_col, like_col = st.columns([12, 2, 1])
         with card_col:
             st.markdown(render_event_card_html(
                 title=row.get("title", "Untitled"),
                 venue=row.get("venue", "TBA"),
                 city=row.get("city", "Unknown"),
                 date_str=date_str,
-                price=row.get("price", 0),
+                price=event_price,
                 category=t_cat(cat),
                 cat_icon=cat_icon,
                 cat_color=cat_color,
@@ -119,12 +122,32 @@ else:
                 free_text=t("free"),
                 image_data_uri=img_uri,
             ), unsafe_allow_html=True)
+        with buy_col:
+            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+            if event_price > 0:
+                if state.payments.has_purchased(event_id):
+                    st.markdown(
+                        f"<span style='color:#10B981;font-weight:600;font-size:0.85rem;'>{t('already_purchased')}</span>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    if st.button(
+                        t("buy_ticket"),
+                        key=f"buy_{event_id}",
+                        type="primary",
+                    ):
+                        st.session_state["_payment_event"] = {
+                            "id": event_id,
+                            "title": row.get("title", ""),
+                            "price": event_price,
+                        }
+                        payment_dialog()
         with like_col:
             st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
             if st.button(
                 "❤️" if is_saved else "🤍",
-                key=f"save_{row.get('id')}",
+                key=f"save_{event_id}",
                 help=t("save"),
             ):
-                state.ui.toggle_save(row.get("id"))
+                state.ui.toggle_save(event_id)
                 st.rerun()

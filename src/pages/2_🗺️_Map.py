@@ -85,6 +85,7 @@ else:
 
     folium.TileLayer(
         tiles="OpenStreetMap",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         name="OpenStreetMap",
         overlay=False,
         control=True,
@@ -196,14 +197,16 @@ else:
                 <p style="color:#555; font-size:0.78rem; margin:0 0 6px 0;">
                     {row.get('description', '')[:80]}{'...' if len(row.get('description', '')) > 80 else ''}
                 </p>
-                <div style="display:flex; align-items:center; gap:6px;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                     <span style="background:{price_color}15; color:{price_color};
                         padding:3px 10px; border-radius:6px; display:inline-block;
                         font-weight:700; font-size:0.85rem;">
                         {price_str}
                     </span>
+                    {"<span style='background:rgba(99,102,241,0.15);color:#6366F1;padding:3px 8px;border-radius:6px;font-size:0.72rem;font-weight:600;'>🎫 Ticket</span>" if price > 0 else ""}
                     {photo_details_html}
                 </div>
+                {"<p style='color:#6366F1;font-size:0.7rem;margin:4px 0 0 0;font-style:italic;'>📋 " + t("visit_events_to_buy") + "</p>" if price > 0 else ""}
             </div>
             """
 
@@ -226,3 +229,4 @@ else:
     except Exception as e:
         st.error(f"Map rendering error: {e}")
         st.info("Try refreshing the page.")
+

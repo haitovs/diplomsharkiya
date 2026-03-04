@@ -698,5 +698,20 @@
     "image": "images/cat_art.jpg",
     "icon": "art",
     "description": ""
+  },
+  {
+    "id": "evt7a3f1d",
+    "title": "Talyp gozeli",
+    "category": "Community",
+    "city": "Ashgabat",
+    "venue": "Oguz Han adyndaky Türkmenistanyň Inžener-tehnologiýalar uniwersiteti",
+    "date_start": "2026-04-15T14:00:00",
+    "date_end": "2026-04-15T18:00:00",
+    "price": 0,
+    "popularity": 78,
+    "lat": 37.9400,
+    "lon": 58.3800,
+    "image": "images/cat_community.jpg",
+    "description": "Talyp gözeli — student beauty and talent contest celebrating youth culture and creativity."
   }
 ]

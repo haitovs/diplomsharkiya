@@ -6,6 +6,7 @@ Senior Developer Best Practices Implementation
 from dataclasses import dataclass, field
 from typing import Set, List, Optional, Dict, Any
 from datetime import datetime
+import uuid
 import streamlit as st
 
 
@@ -75,6 +76,32 @@ class UIState:
         return event_id in self.saved_events
 
 
+@dataclass
+class PaymentState:
+    """Manages payment/transaction state."""
+    transactions: List[Dict[str, Any]] = field(default_factory=list)
+
+    def add_transaction(self, event_id: str, title: str, amount: float,
+                        name: str, card_last4: str) -> str:
+        txn_id = f"TXN-{uuid.uuid4().hex[:8].upper()}"
+        self.transactions.append({
+            "txn_id": txn_id,
+            "event_id": event_id,
+            "title": title,
+            "amount": amount,
+            "name": name,
+            "card_last4": card_last4,
+            "timestamp": datetime.now().isoformat(),
+        })
+        return txn_id
+
+    def has_purchased(self, event_id: str) -> bool:
+        return any(t["event_id"] == event_id for t in self.transactions)
+
+    def get_history(self) -> List[Dict[str, Any]]:
+        return sorted(self.transactions, key=lambda t: t["timestamp"], reverse=True)
+
+
 class AppStateManager:
     """
     Centralized state management for the application.
@@ -96,6 +123,7 @@ class AppStateManager:
         self.filters = FilterState()
         self.map = MapState()
         self.ui = UIState()
+        self.payments = PaymentState()
         self._initialized = True
     
     @classmethod
@@ -109,12 +137,14 @@ class AppStateManager:
             st.session_state.app_state = {
                 "filters": self.filters,
                 "map": self.map,
-                "ui": self.ui
+                "ui": self.ui,
+                "payments": self.payments,
             }
         else:
             st.session_state.app_state["filters"] = self.filters
             st.session_state.app_state["map"] = self.map
             st.session_state.app_state["ui"] = self.ui
+            st.session_state.app_state["payments"] = self.payments
     
     def load_from_session_state(self):
         """Load state from Streamlit session_state."""
@@ -122,6 +152,7 @@ class AppStateManager:
             self.filters = st.session_state.app_state.get("filters", FilterState())
             self.map = st.session_state.app_state.get("map", MapState())
             self.ui = st.session_state.app_state.get("ui", UIState())
+            self.payments = st.session_state.app_state.get("payments", PaymentState())
     
     def reset_filters(self):
         """Reset all filters to default."""

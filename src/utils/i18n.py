@@ -651,6 +651,98 @@ TRANSLATIONS = {
         "ru": "🔧 Админ",
         "tk": "🔧 Dolandyryjy",
     },
+
+    # ─── Payment ──────────────────────────────────
+    "buy_ticket": {
+        "en": "🎫 Buy Ticket",
+        "ru": "🎫 Купить билет",
+        "tk": "🎫 Bilet satyn al",
+    },
+    "payment_form_title": {
+        "en": "Secure Checkout",
+        "ru": "Безопасная оплата",
+        "tk": "Howpsuz töleg",
+    },
+    "card_number": {
+        "en": "Card Number",
+        "ru": "Номер карты",
+        "tk": "Kart belgisi",
+    },
+    "expiry_date": {
+        "en": "Expiry Date (MM/YY)",
+        "ru": "Срок действия (ММ/ГГ)",
+        "tk": "Möhleti (AA/ÝÝ)",
+    },
+    "cvv": {
+        "en": "CVV",
+        "ru": "CVV",
+        "tk": "CVV",
+    },
+    "cardholder_name": {
+        "en": "Cardholder Name",
+        "ru": "Имя владельца карты",
+        "tk": "Kart eýesiniň ady",
+    },
+    "amount": {
+        "en": "Amount",
+        "ru": "Сумма",
+        "tk": "Mukdar",
+    },
+    "pay_now": {
+        "en": "Pay Now",
+        "ru": "Оплатить",
+        "tk": "Häzir töle",
+    },
+    "processing_payment": {
+        "en": "Processing payment...",
+        "ru": "Обработка платежа...",
+        "tk": "Töleg işlenýär...",
+    },
+    "payment_successful": {
+        "en": "Payment Successful!",
+        "ru": "Оплата прошла успешно!",
+        "tk": "Töleg üstünlikli!",
+    },
+    "transaction_id": {
+        "en": "Transaction ID",
+        "ru": "ID транзакции",
+        "tk": "Amal belgisi",
+    },
+    "ticket_purchased": {
+        "en": "Ticket Purchased",
+        "ru": "Билет куплен",
+        "tk": "Bilet satyn alyndy",
+    },
+    "already_purchased": {
+        "en": "✅ Purchased",
+        "ru": "✅ Куплено",
+        "tk": "✅ Satyn alyndy",
+    },
+    "invalid_card": {
+        "en": "Card number must be 16 digits",
+        "ru": "Номер карты должен содержать 16 цифр",
+        "tk": "Kart belgisi 16 san bolmaly",
+    },
+    "invalid_expiry": {
+        "en": "Invalid expiry date (use MM/YY)",
+        "ru": "Неверный срок действия (формат ММ/ГГ)",
+        "tk": "Nädogry möhlet (AA/ÝÝ ulanyň)",
+    },
+    "invalid_cvv": {
+        "en": "CVV must be 3 digits",
+        "ru": "CVV должен содержать 3 цифры",
+        "tk": "CVV 3 san bolmaly",
+    },
+    "visit_events_to_buy": {
+        "en": "Visit Events page to purchase tickets",
+        "ru": "Перейдите на страницу Событий для покупки билетов",
+        "tk": "Bilet satyn almak üçin Çäreler sahypasyna geçiň",
+    },
+    "done": {
+        "en": "Done",
+        "ru": "Готово",
+        "tk": "Taýýar",
+    },
 }
 
 # ─── Category name translations ─────────────────
