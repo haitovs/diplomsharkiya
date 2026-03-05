@@ -8,6 +8,7 @@ from utils.filters import apply_filters
 from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
 from components.styles import inject_custom_css, get_category_color_hex
+from components.payment import payment_dialog
 from config import CATEGORY_CONFIG
 
 st.set_page_config(page_title="Map | Event Discovery", page_icon="🗺️", layout="wide")
@@ -17,6 +18,20 @@ render_language_selector()
 
 df = load_data()
 state = get_state()
+
+# --- PAYMENT DIALOG TRIGGER (from map popup link) ---
+_buy_id = st.query_params.get("buy")
+if _buy_id:
+    st.query_params.clear()
+    _buy_row = df[df["id"] == _buy_id]
+    if not _buy_row.empty:
+        _r = _buy_row.iloc[0]
+        st.session_state["_payment_event"] = {
+            "id": _r["id"],
+            "title": _r["title"],
+            "price": _r["price"],
+        }
+        payment_dialog()
 
 st.title(f"🗺️ {t('map_page_title')}")
 
@@ -206,7 +221,7 @@ else:
                     {"<span style='background:rgba(99,102,241,0.15);color:#6366F1;padding:3px 8px;border-radius:6px;font-size:0.72rem;font-weight:600;'>🎫 Ticket</span>" if price > 0 else ""}
                     {photo_details_html}
                 </div>
-                {"<p style='color:#6366F1;font-size:0.7rem;margin:4px 0 0 0;font-style:italic;'>📋 " + t("visit_events_to_buy") + "</p>" if price > 0 else ""}
+                {"<a href='?buy=" + row['id'] + "' target='_top' style='display:inline-block;margin-top:6px;padding:5px 14px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border-radius:8px;font-size:0.78rem;font-weight:600;text-decoration:none;text-align:center;'>🎫 " + t("buy_ticket").replace("🎫 ", "") + "</a>" if price > 0 else ""}
             </div>
             """
 

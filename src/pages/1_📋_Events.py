@@ -7,7 +7,7 @@ from components.styles import (
     inject_custom_css, render_section_header,
     render_event_card_html, get_category_color_hex
 )
-from components.ui_components import payment_dialog
+from components.payment import payment_dialog
 from config import CATEGORY_CONFIG
 
 # Page Config
