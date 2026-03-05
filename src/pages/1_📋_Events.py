@@ -27,16 +27,28 @@ if df.empty:
     st.error(t("no_events"))
     st.stop()
 
+# --- PURCHASED TICKETS LIST ---
+if state.payments.transactions:
+    with st.expander(f"🎫 {t('my_tickets')} ({len(state.payments.transactions)})", expanded=False):
+        for txn in state.payments.get_history():
+            tc1, tc2, tc3, tc4 = st.columns([4, 2, 2, 2])
+            with tc1:
+                st.markdown(f"**{txn['title']}**")
+            with tc2:
+                st.caption(f"💰 {int(txn['amount'])} TMT")
+            with tc3:
+                st.caption(f"🆔 `{txn['txn_id']}`")
+            with tc4:
+                st.caption(f"📅 {txn['timestamp'][:10]}")
+
 # --- SIDEBAR FILTERS ---
 with st.sidebar:
     st.header(f"🔍 {t('filter_by_category')}")
 
-    # Search
     state.filters.search_query = st.text_input(
         t("search_events"), value=state.filters.search_query, placeholder=t("search_events")
     )
 
-    # City
     city_options = [t("all_cities")] + sorted(df["city"].unique().tolist())
     current_city = state.filters.city
     if current_city == "All Cities":
@@ -46,17 +58,14 @@ with st.sidebar:
         city_options,
         index=city_options.index(current_city) if current_city in city_options else 0
     )
-    # Map translated "All Cities" back to internal value
     if state.filters.city == t("all_cities"):
         state.filters.city = "All Cities"
 
-    # Categories
     cat_options = sorted(df["category"].unique().tolist())
     state.filters.categories = st.multiselect(
         t("filter_by_category"), cat_options, default=state.filters.categories
     )
 
-    # Date — translate labels but map back to internal English values
     date_keys = ["All", "Today", "This Week", "This Month"]
     date_labels = [t("all"), t("today"), t("this_week"), t("this_month")]
     current_idx = date_keys.index(state.filters.date_preset) if state.filters.date_preset in date_keys else 0
@@ -65,7 +74,6 @@ with st.sidebar:
     )
     state.filters.date_preset = date_keys[date_labels.index(selected_date_label)]
 
-    # Price
     if "price" in df.columns:
         max_p = int(df["price"].max())
         state.filters.max_price = st.slider(
@@ -102,48 +110,47 @@ else:
             except Exception:
                 date_str = str(start)
 
+        event_id = row.get("id", "")
         img_uri = get_event_image_base64(row.get("image", ""))
-        is_saved = state.ui.is_saved(row.get("id"))
+        is_saved = state.ui.is_saved(event_id)
         event_price = row.get("price", 0)
-        event_id = row.get("id")
+        purchase_count = state.payments.get_purchase_count(event_id)
 
-        card_col, buy_col, like_col = st.columns([12, 2, 1])
+        card_html = render_event_card_html(
+            title=row.get("title", "Untitled"),
+            venue=row.get("venue", "TBA"),
+            city=row.get("city", "Unknown"),
+            date_str=date_str,
+            price=event_price,
+            category=t_cat(cat),
+            cat_icon=cat_icon,
+            cat_color=cat_color,
+            description=row.get("description", ""),
+            free_text=t("free"),
+            image_data_uri=img_uri,
+        )
+
+        # Card + actions in a tight row
+        card_col, act_col = st.columns([14, 1])
         with card_col:
-            st.markdown(render_event_card_html(
-                title=row.get("title", "Untitled"),
-                venue=row.get("venue", "TBA"),
-                city=row.get("city", "Unknown"),
-                date_str=date_str,
-                price=event_price,
-                category=t_cat(cat),
-                cat_icon=cat_icon,
-                cat_color=cat_color,
-                description=row.get("description", ""),
-                free_text=t("free"),
-                image_data_uri=img_uri,
-            ), unsafe_allow_html=True)
-        with buy_col:
-            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+            st.markdown(card_html, unsafe_allow_html=True)
+        with act_col:
+            # Buy ticket button (paid events only)
             if event_price > 0:
-                if state.payments.has_purchased(event_id):
+                if st.button("🎫", key=f"buy_{event_id}", help=t("buy_ticket")):
+                    st.session_state["_payment_event"] = {
+                        "id": event_id,
+                        "title": row.get("title", ""),
+                        "price": event_price,
+                    }
+                    payment_dialog()
+                # Purchased count indicator
+                if purchase_count > 0:
                     st.markdown(
-                        f"<span style='color:#10B981;font-weight:600;font-size:0.85rem;'>{t('already_purchased')}</span>",
+                        f"<div style='text-align:center;font-size:0.6rem;color:#10B981;font-weight:600;margin-top:-0.5rem;'>✅×{purchase_count}</div>",
                         unsafe_allow_html=True,
                     )
-                else:
-                    if st.button(
-                        t("buy_ticket"),
-                        key=f"buy_{event_id}",
-                        type="primary",
-                    ):
-                        st.session_state["_payment_event"] = {
-                            "id": event_id,
-                            "title": row.get("title", ""),
-                            "price": event_price,
-                        }
-                        payment_dialog()
-        with like_col:
-            st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+            # Like/save button
             if st.button(
                 "❤️" if is_saved else "🤍",
                 key=f"save_{event_id}",

@@ -19,14 +19,6 @@ def payment_dialog():
 
     state = get_state()
 
-    # Already purchased guard
-    if state.payments.has_purchased(ev["id"]):
-        st.success(f"✅ {t('already_purchased')}")
-        st.markdown(f"**{ev['title']}**")
-        if st.button(t("done"), use_container_width=True):
-            st.rerun()
-        return
-
     # Header
     st.markdown(f"### {ev['title']}")
     st.markdown(f"**{t('amount')}:** `{int(ev['price'])} TMT`")
@@ -69,12 +61,13 @@ def payment_dialog():
                 st.error(e)
             return
 
-        # Processing simulation
+        # Processing simulation — fast, smooth steps
         with st.spinner(t("processing_payment")):
             bar = st.progress(0)
-            for i in range(100):
-                time.sleep(0.025)
-                bar.progress(i + 1)
+            for pct in range(0, 101, 5):
+                time.sleep(0.06)
+                bar.progress(pct)
+            bar.progress(100)
 
         # Record transaction
         txn_id = state.payments.add_transaction(

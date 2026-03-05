@@ -263,6 +263,36 @@ def inject_custom_css():
         scroll-behavior: smooth;
     }
 
+    /* ── Event row: merge action column into card ── */
+    .evt-row {
+        display: flex;
+        align-items: stretch;
+        margin-bottom: 0.75rem;
+        gap: 0;
+    }
+    .evt-row > div:first-child {
+        flex: 1;
+        min-width: 0;
+    }
+    .evt-row > div:first-child .evt-card {
+        border-radius: 12px 0 0 12px !important;
+        margin-bottom: 0 !important;
+        height: 100%;
+    }
+    .evt-actions {
+        flex: 0 0 80px;
+        background: #141B34;
+        border: 1px solid rgba(99,102,241,0.12);
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        padding: 0.5rem 0.4rem;
+    }
+
     /* ── Payment Dialog ──────────────────────────── */
     div[data-testid="stDialog"] .pay-btn button {
         background: linear-gradient(135deg, #10B981, #059669) !important;
@@ -367,10 +397,10 @@ def render_event_card_html(title: str, venue: str, city: str, date_str: str,
     <div class="evt-card" style="
         background: #141B34; border: 1px solid rgba(99, 102, 241, 0.12);
         border-left: 4px solid {cat_color}; border-radius: 12px;
-        overflow: hidden; margin-bottom: 0.75rem;
+        overflow: hidden; margin-bottom: 1rem;
     ">
         <div style="display: flex; align-items: stretch;">
-            <div style="flex: 0 0 30%; max-width: 30%; min-height: 110px;">
+            <div style="flex: 0 0 28%; max-width: 28%; min-height: 110px;">
                 {img_html}
             </div>
             <div style="flex: 1; padding: 1rem 1.25rem; display: flex; flex-direction: column; justify-content: center;">

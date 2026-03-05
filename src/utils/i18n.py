@@ -743,6 +743,11 @@ TRANSLATIONS = {
         "ru": "Готово",
         "tk": "Taýýar",
     },
+    "my_tickets": {
+        "en": "My Tickets",
+        "ru": "Мои билеты",
+        "tk": "Meniň biletlerim",
+    },
 }
 
 # ─── Category name translations ─────────────────

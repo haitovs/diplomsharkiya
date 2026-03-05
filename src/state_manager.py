@@ -98,6 +98,9 @@ class PaymentState:
     def has_purchased(self, event_id: str) -> bool:
         return any(t["event_id"] == event_id for t in self.transactions)
 
+    def get_purchase_count(self, event_id: str) -> int:
+        return sum(1 for t in self.transactions if t["event_id"] == event_id)
+
     def get_history(self) -> List[Dict[str, Any]]:
         return sorted(self.transactions, key=lambda t: t["timestamp"], reverse=True)
 
