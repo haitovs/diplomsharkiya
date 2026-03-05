@@ -1,9 +1,8 @@
 import streamlit as st
-import pandas as pd
 import folium
 from branca.element import Element
 from streamlit_folium import st_folium
-from utils.data_loader import load_data, get_event_image_base64, get_category_image_path
+from utils.data_loader import load_data
 from utils.filters import apply_filters
 from utils.i18n import t, t_cat, render_language_selector
 from state_manager import get_state
@@ -112,22 +111,6 @@ def _build_map_html(events_json: str, lang: str, city_filter: str, cat_filter: t
 
     folium.LayerControl().add_to(m)
 
-    # Image cache for this build
-    _img_cache = {}
-
-    def _get_img(cat, img_path):
-        key = img_path or cat
-        if key in _img_cache:
-            return _img_cache[key]
-        path = img_path
-        if not path or path == "images/event_default.jpg":
-            path = get_category_image_path(cat)
-        uri = get_event_image_base64(path)
-        if not uri:
-            uri = get_event_image_base64("images/event_default.jpg")
-        _img_cache[key] = uri
-        return uri
-
     free_text = t("free")
     buy_label = t("buy_ticket").replace("🎫 ", "")
 
@@ -161,21 +144,6 @@ def _build_map_html(events_json: str, lang: str, city_filter: str, cat_filter: t
             except Exception:
                 date_str = str(ds).split("T")[0] if "T" in str(ds) else str(ds)
 
-        img_data_uri = _get_img(cat, row.get("image", ""))
-        photo_html = ""
-        if img_data_uri:
-            photo_html = (
-                '<details style="display:inline-block;margin:0;vertical-align:middle;">'
-                '<summary style="cursor:pointer;display:inline-block;'
-                'background:rgba(99,102,241,0.15);color:#6366F1;'
-                'border-radius:6px;padding:2px 8px;font-size:0.72rem;'
-                'font-weight:600;list-style:none;user-select:none;'
-                'line-height:1.4;">📷</summary>'
-                f'<img src="{img_data_uri}" style="max-height:60px;max-width:100%;'
-                f'object-fit:cover;border-radius:4px;margin-top:4px;display:block;" />'
-                '</details>'
-            )
-
         desc = row.get("description", "")[:80]
         if len(row.get("description", "")) > 80:
             desc += "..."
@@ -200,7 +168,6 @@ def _build_map_html(events_json: str, lang: str, city_filter: str, cat_filter: t
                     padding:3px 10px;border-radius:6px;display:inline-block;
                     font-weight:700;font-size:0.85rem;">{price_str}</span>
                 {ticket_badge}
-                {photo_html}
             </div>
             {buy_btn}
         </div>"""
