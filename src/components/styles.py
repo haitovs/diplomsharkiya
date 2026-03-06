@@ -11,17 +11,7 @@ def _esc(text: str) -> str:
     """Escape text for safe HTML embedding."""
     return _html.escape(str(text)) if text else ""
 
-_CSS_INJECTED = False
-
-def inject_custom_css():
-    """Inject custom CSS once per session to avoid re-parsing on every rerun."""
-    global _CSS_INJECTED
-    if _CSS_INJECTED and st.session_state.get("_css_done"):
-        return
-    _CSS_INJECTED = True
-    st.session_state["_css_done"] = True
-
-    st.markdown("""
+_CSS = """
     <style>
     /* ── Google Font (preconnect for speed) ───── */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -162,7 +152,12 @@ def inject_custom_css():
         box-shadow: 0 6px 18px rgba(16,185,129,0.3) !important;
     }
     </style>
-    """, unsafe_allow_html=True)
+    """
+
+
+def inject_custom_css():
+    """Inject the pre-built CSS string. Must run every page render."""
+    st.markdown(_CSS, unsafe_allow_html=True)
 
 
 def render_hero(title: str, subtitle: str, icon: str = "🎟️", badge: str = "Event Discovery Platform"):
