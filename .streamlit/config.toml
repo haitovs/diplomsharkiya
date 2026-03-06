@@ -1,6 +1,12 @@
 [server]
 enableCORS = false
 enableXsrfProtection = false
+runOnSave = false
+maxUploadSize = 50
+maxMessageSize = 200
+
+[client]
+toolbarMode = "minimal"
 
 [theme]
 primaryColor = "#6366F1"

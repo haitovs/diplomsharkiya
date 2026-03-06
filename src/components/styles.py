@@ -11,303 +11,155 @@ def _esc(text: str) -> str:
     """Escape text for safe HTML embedding."""
     return _html.escape(str(text)) if text else ""
 
+_CSS_INJECTED = False
+
 def inject_custom_css():
-    """Inject custom CSS to override Streamlit defaults with the Event Discovery design system."""
+    """Inject custom CSS once per session to avoid re-parsing on every rerun."""
+    global _CSS_INJECTED
+    if _CSS_INJECTED and st.session_state.get("_css_done"):
+        return
+    _CSS_INJECTED = True
+    st.session_state["_css_done"] = True
+
     st.markdown("""
     <style>
-    /* ── Google Font ────────────────────────────── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    /* ── Google Font (preconnect for speed) ───── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    /* ── Keyframe Animations ─────────────────────── */
-    @keyframes gradientShift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    @keyframes shimmer {
-        0%   { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-    }
-
+    /* ── Single animation (fadeIn only, no infinite loops) ── */
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(18px); }
+        from { opacity: 0; transform: translateY(12px); }
         to   { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes subtlePulse {
-        0%, 100% { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
-        50%      { box-shadow: 0 8px 20px -2px rgba(99,102,241,0.2); }
-    }
-
-    @keyframes pricePulse {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.3); }
-        50%      { box-shadow: 0 0 12px 2px rgba(16,185,129,0.25); }
-    }
-
     /* ── Global Overrides ──────────────────────── */
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif !important;
-    }
-
-    * {
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+    html { scroll-behavior: smooth; }
 
     /* ── Sidebar Branding ──────────────────────── */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0A0E27 0%, #141B34 100%) !important;
     }
-
-    [data-testid="stSidebar"] [data-testid="stMarkdown"] {
-        color: #F8FAFC;
-    }
-
+    [data-testid="stSidebar"] [data-testid="stMarkdown"] { color: #F8FAFC; }
     [data-testid="stSidebar"]::before {
         content: "🎟️ EventHub";
-        display: block;
-        padding: 1.5rem 1rem 0.5rem;
-        font-size: 1.5rem;
-        font-weight: 700;
+        display: block; padding: 1.5rem 1rem 0.5rem;
+        font-size: 1.5rem; font-weight: 700;
         background: linear-gradient(135deg, #6366F1, #10B981);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.02em;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; letter-spacing: -0.02em;
     }
+    [data-testid="stSidebarNav"] { display: none !important; }
 
-    /* ── Typography — gradient h1 (non-hero) ───── */
+    /* ── Typography ────────────────────────────── */
     h1 {
-        font-weight: 700 !important;
-        letter-spacing: -0.03em !important;
+        font-weight: 700 !important; letter-spacing: -0.03em !important;
         background: linear-gradient(135deg, #6366F1, #10B981);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-
-    h2, h3 {
-        font-weight: 600 !important;
-        letter-spacing: -0.02em !important;
-    }
-
-    /* Hero h1 stays white */
+    h2, h3 { font-weight: 600 !important; letter-spacing: -0.02em !important; }
     .hero-banner h1 {
-        background: none !important;
-        -webkit-text-fill-color: white !important;
-        color: white !important;
+        background: none !important; -webkit-text-fill-color: white !important; color: white !important;
     }
 
     /* ── Metric Cards ──────────────────────────── */
     [data-testid="stMetric"] {
         background: linear-gradient(135deg, #141B34 0%, #1A2238 100%);
-        border: 1px solid rgba(99, 102, 241, 0.15);
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(99,102,241,0.15); border-radius: 12px;
+        padding: 1rem 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
     }
-
     [data-testid="stMetric"]:hover {
-        border-color: rgba(99, 102, 241, 0.4);
-        animation: subtlePulse 2s ease infinite;
-        transform: translateY(-2px);
+        border-color: rgba(99,102,241,0.4); transform: translateY(-2px);
     }
-
     [data-testid="stMetric"] label {
-        color: #94A3B8 !important;
-        font-weight: 500;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        color: #94A3B8 !important; font-weight: 500; font-size: 0.85rem;
+        text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    [data-testid="stMetric"] [data-testid="stMetricValue"] { color: #F8FAFC !important; font-weight: 700; font-size: 1.75rem; }
+    [data-testid="stMetric"] [data-testid="stMetricDelta"] { color: #10B981 !important; }
+    [data-testid="column"] [data-testid="stMetric"] {
+        min-height: 110px; display: flex; flex-direction: column; justify-content: center;
     }
 
-    [data-testid="stMetric"] [data-testid="stMetricValue"] {
-        color: #F8FAFC !important;
-        font-weight: 700;
-        font-size: 1.75rem;
-    }
-
-    [data-testid="stMetric"] [data-testid="stMetricDelta"] {
-        color: #10B981 !important;
-    }
-
-    /* ── Containers (Cards) ────────────────────── */
+    /* ── Containers ────────────────────────────── */
     [data-testid="stVerticalBlock"] > div[data-testid="stExpander"],
     div[data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: 12px !important;
-        border-color: rgba(99, 102, 241, 0.12) !important;
-        transition: all 0.3s ease;
+        border-radius: 12px !important; border-color: rgba(99,102,241,0.12) !important;
     }
-
     div[data-testid="stVerticalBlockBorderWrapper"]:hover {
-        border-color: rgba(99, 102, 241, 0.35) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        border-color: rgba(99,102,241,0.35) !important;
+        box-shadow: 0 4px 12px rgba(99,102,241,0.1);
     }
 
-    /* ── Event Card (.evt-card) ──────────────────── */
-    .evt-card {
-        animation: fadeInUp 0.5s ease both;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    /* ── Event Card ────────────────────────────── */
+    .evt-card { animation: fadeInUp 0.35s ease both; }
     .evt-card:hover {
         transform: translateY(-3px);
-        border-color: rgba(99, 102, 241, 0.45) !important;
-        box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.18);
+        border-color: rgba(99,102,241,0.45) !important;
+        box-shadow: 0 12px 28px -4px rgba(99,102,241,0.18);
     }
-
-    /* Category badge shimmer */
     .cat-badge {
-        background: linear-gradient(90deg, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0.25) 50%, rgba(99,102,241,0.1) 100%);
-        background-size: 200% 100%;
-        animation: shimmer 3s linear infinite;
+        background: rgba(99,102,241,0.15); color: #818CF8;
+        padding: 0.15rem 0.6rem; border-radius: 20px;
+        font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     }
-
-    /* Free price tag pulse */
-    .price-free {
-        animation: pricePulse 3s ease infinite;
-    }
+    .price-free { box-shadow: 0 0 8px 1px rgba(16,185,129,0.2); }
 
     /* ── Buttons ────────────────────────────────── */
     .stButton > button {
-        border-radius: 8px !important;
-        font-weight: 600 !important;
+        border-radius: 8px !important; font-weight: 600 !important;
         font-family: 'Inter', sans-serif !important;
-        letter-spacing: 0.01em;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: all 0.2s ease !important;
     }
-
-    .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-    }
-
-    .stButton > button:active {
-        transform: scale(0.98);
-    }
-
+    .stButton > button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.25); }
+    .stButton > button:active { transform: scale(0.98); }
     .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
-        background-size: 200% 200% !important;
-        animation: gradientShift 6s ease infinite !important;
-        border: none !important;
+        background: linear-gradient(135deg, #6366F1, #8B5CF6) !important; border: none !important;
     }
-
     .stButton > button[kind="primary"]:hover {
         background: linear-gradient(135deg, #818CF8, #A78BFA) !important;
     }
 
-    /* ── Dividers ───────────────────────────────── */
-    hr {
-        border-color: rgba(99, 102, 241, 0.12) !important;
-    }
-
-    /* ── Selectbox / Inputs ─────────────────────── */
-    .stSelectbox > div > div,
-    .stMultiSelect > div > div,
+    /* ── Inputs ─────────────────────────────────── */
+    .stSelectbox > div > div, .stMultiSelect > div > div,
     .stTextInput > div > div > input {
-        border-radius: 8px !important;
-        border-color: rgba(99, 102, 241, 0.2) !important;
-        transition: border-color 0.2s ease !important;
+        border-radius: 8px !important; border-color: rgba(99,102,241,0.2) !important;
     }
-
-    .stSelectbox > div > div:focus-within,
-    .stMultiSelect > div > div:focus-within,
+    .stSelectbox > div > div:focus-within, .stMultiSelect > div > div:focus-within,
     .stTextInput > div > div > input:focus {
-        border-color: #6366F1 !important;
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+        border-color: #6366F1 !important; box-shadow: 0 0 0 2px rgba(99,102,241,0.15) !important;
     }
 
     /* ── Tabs ───────────────────────────────────── */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-    }
+    .stTabs [data-baseweb="tab-list"] { gap: 0.5rem; }
+    .stTabs [data-baseweb="tab"] { border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500; }
 
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-    }
+    /* ── Misc ───────────────────────────────────── */
+    .stProgress > div > div > div > div { background: linear-gradient(90deg, #6366F1, #10B981) !important; border-radius: 6px; }
+    .stAlert { border-radius: 10px !important; }
+    hr { border-color: rgba(99,102,241,0.12) !important; }
+    .block-container { padding-bottom: 3rem; }
 
-    /* ── Progress bars ─────────────────────────── */
-    .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, #6366F1, #10B981) !important;
-        border-radius: 6px;
-    }
-
-    /* ── Toast / Alert consistency ──────────────── */
-    .stAlert {
-        border-radius: 10px !important;
-    }
-
-    /* ── Footer spacing ────────────────────────── */
-    .block-container {
-        padding-bottom: 3rem;
-    }
-
-    /* ── Equal height metric cards ─────────────── */
-    [data-testid="column"] [data-testid="stMetric"] {
-        min-height: 110px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    /* ── Hide default Streamlit page navigation in sidebar ── */
-    [data-testid="stSidebarNav"] {
-        display: none !important;
-    }
-
-    /* ── Smooth scrolling ──────────────────────── */
-    html {
-        scroll-behavior: smooth;
-    }
-
-    /* ── Event row: merge action column into card ── */
-    .evt-row {
-        display: flex;
-        align-items: stretch;
-        margin-bottom: 0.75rem;
-        gap: 0;
-    }
-    .evt-row > div:first-child {
-        flex: 1;
-        min-width: 0;
-    }
-    .evt-row > div:first-child .evt-card {
-        border-radius: 12px 0 0 12px !important;
-        margin-bottom: 0 !important;
-        height: 100%;
-    }
+    /* ── Event row layout ──────────────────────── */
+    .evt-row { display: flex; align-items: stretch; margin-bottom: 0.75rem; gap: 0; }
+    .evt-row > div:first-child { flex: 1; min-width: 0; }
+    .evt-row > div:first-child .evt-card { border-radius: 12px 0 0 12px !important; margin-bottom: 0 !important; height: 100%; }
     .evt-actions {
-        flex: 0 0 80px;
-        background: #141B34;
-        border: 1px solid rgba(99,102,241,0.12);
-        border-left: none;
-        border-radius: 0 12px 12px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        padding: 0.5rem 0.4rem;
+        flex: 0 0 80px; background: #141B34; border: 1px solid rgba(99,102,241,0.12);
+        border-left: none; border-radius: 0 12px 12px 0;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 0.35rem; padding: 0.5rem 0.4rem;
     }
 
     /* ── Payment Dialog ──────────────────────────── */
     div[data-testid="stDialog"] .pay-btn button {
         background: linear-gradient(135deg, #10B981, #059669) !important;
-        color: white !important;
-        border: none !important;
-        font-weight: 700 !important;
-        font-size: 1rem !important;
-        padding: 0.6rem 1.5rem !important;
-        border-radius: 10px !important;
-        transition: all 0.25s ease !important;
+        color: white !important; border: none !important; font-weight: 700 !important;
+        font-size: 1rem !important; padding: 0.6rem 1.5rem !important; border-radius: 10px !important;
     }
     div[data-testid="stDialog"] .pay-btn button:hover {
         background: linear-gradient(135deg, #34D399, #10B981) !important;
         box-shadow: 0 6px 18px rgba(16,185,129,0.3) !important;
-        transform: translateY(-1px);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -318,30 +170,16 @@ def render_hero(title: str, subtitle: str, icon: str = "🎟️", badge: str = "
     st.markdown(f"""
     <div class="hero-banner" style="
         background: linear-gradient(135deg, #6366F1 0%, #4F46E5 40%, #10B981 100%);
-        background-size: 300% 300%;
-        animation: gradientShift 8s ease infinite;
-        padding: 3rem 2.5rem;
-        border-radius: 16px;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: white;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.35);
+        padding: 3rem 2.5rem; border-radius: 16px; margin-bottom: 2rem;
+        text-align: center; color: white; position: relative; overflow: hidden;
+        box-shadow: 0 20px 40px -12px rgba(99,102,241,0.35);
     ">
-        <div style="
-            position: absolute; top: -50%; right: -20%; width: 60%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-            pointer-events: none;
-        "></div>
         <p style="
             display: inline-block; padding: 0.3rem 1rem;
-            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.1) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 3s linear infinite;
+            background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.25);
             border-radius: 20px; font-size: 0.85rem; font-weight: 500;
-            margin-bottom: 0.75rem; backdrop-filter: blur(4px);
+            margin-bottom: 0.75rem;
         ">{icon} {badge}</p>
         <h1 style="
             color: white !important; margin: 0 0 0.5rem 0;

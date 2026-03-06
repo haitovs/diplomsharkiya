@@ -75,10 +75,10 @@ with st.sidebar:
 filtered_df = apply_filters(df, state.filters)
 
 @st.cache_data(ttl=300, show_spinner=False)
-def _build_map_html(events_json: str, lang: str, city_filter: str, cat_filter: tuple):
-    """Build the folium map and return its HTML. Cached for 5 minutes."""
+def _build_map_html(event_ids: tuple, lang: str, city_filter: str, cat_filter: tuple, _json_data: str = ""):
+    """Build the folium map. Cached by event IDs (lightweight key)."""
     import json as _json
-    rows = _json.loads(events_json)
+    rows = _json.loads(_json_data)
 
     # Center logic
     if city_filter != "All Cities" and rows:
@@ -187,12 +187,12 @@ if filtered_df.empty:
 else:
     st.caption(f"{t('showing_events')}: {len(filtered_df)}")
 
-    # Serialize filtered data for caching (hashable key)
     from utils.i18n import get_lang
+    _event_ids = tuple(filtered_df["id"].tolist()) if "id" in filtered_df.columns else ()
     _events_json = filtered_df.to_json(orient="records", date_format="iso")
     _cache_key_cats = tuple(sorted(state.filters.categories))
 
-    m = _build_map_html(_events_json, get_lang(), state.filters.city, _cache_key_cats)
+    m = _build_map_html(_event_ids, get_lang(), state.filters.city, _cache_key_cats, _json_data=_events_json)
 
     try:
         with st.container(key="mapcanvas"):
