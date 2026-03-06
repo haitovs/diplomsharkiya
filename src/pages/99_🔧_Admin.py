@@ -98,17 +98,13 @@ if not check_auth():
 events = load_events()
 
 # ─── Header ───────────────────────────────────────
-col_title, col_user, col_logout = st.columns([3, 1, 1])
-with col_title:
-    st.markdown(f"# 🛡️ {t('super_admin')} — {t('event_management_system')}")
-with col_user:
-    st.caption(f"👤 {t('logged_in_as')}: **{st.session_state.get('admin_user', 'admin')}**")
-with col_logout:
+hdr_l, hdr_r = st.columns([5, 1])
+with hdr_l:
+    st.markdown(f"### 🛡️ {t('super_admin')} — {t('event_management_system')}")
+with hdr_r:
     if st.button(f"🚪 {t('logout')}", use_container_width=True):
         st.session_state.admin_auth = False
         st.rerun()
-
-st.divider()
 
 # ─── Two Tabs: Events | Settings ──────────────────
 tab_events, tab_settings = st.tabs([
@@ -176,90 +172,95 @@ with tab_events:
             price = event.get("price", 0)
             price_str = t("free") if price == 0 else f"{int(price)} TMT"
             cat_display = t_cat(event.get("category", ""))
+            eid = event["id"]
 
             with st.expander(
                 f"{cat_display} · **{event.get('title', 'Untitled')}** — "
                 f"{event.get('city', '')} · {price_str}"
             ):
-                # ── Event overview row: image + info + actions ──
-                col_img, col_info, col_actions = st.columns([1, 3, 1])
-
-                with col_img:
+                # ── Compact overview: image + info + inline actions ──
+                ov_img, ov_info = st.columns([1, 5])
+                with ov_img:
                     cur_img_path = pathlib.Path(__file__).parent.parent.parent / "data" / event.get("image", "")
                     if event.get("image") and cur_img_path.exists():
-                        st.image(str(cur_img_path), width=120)
+                        st.image(str(cur_img_path), width=90)
                     else:
-                        st.markdown(
-                            '<div style="width:120px;height:80px;background:#1A2238;'
-                            'border-radius:8px;display:flex;align-items:center;'
-                            'justify-content:center;color:#475569;font-size:2rem;">🖼️</div>',
-                            unsafe_allow_html=True
-                        )
-
-                with col_info:
+                        st.markdown("🖼️", help="No image")
+                with ov_info:
                     st.markdown(
-                        f"**{t('venue_label')}:** {event.get('venue', 'N/A')} · "
-                        f"**{t('event_city')}:** {event.get('city', 'N/A')}"
-                    )
-                    st.markdown(
-                        f"**{t('event_date')}:** {event.get('date_start', 'N/A')} · "
-                        f"**{t('price_label')}:** {price_str}"
+                        f"📍 {event.get('venue', 'N/A')} · {event.get('city', 'N/A')} &nbsp;|&nbsp; "
+                        f"📅 {str(event.get('date_start', 'N/A'))[:16]} &nbsp;|&nbsp; "
+                        f"💰 {price_str}"
                     )
                     if event.get("description"):
-                        st.caption(f"{event['description'][:150]}")
+                        st.caption(event["description"][:120])
 
-                with col_actions:
-                    if st.button(f"📋 {t('duplicate')}", key=f"dup_{event['id']}",
-                                 use_container_width=True):
+                # Inline action buttons
+                act1, act2, act3 = st.columns([1, 1, 4])
+                with act1:
+                    if st.button(f"📋 {t('duplicate')}", key=f"dup_{eid}", use_container_width=True):
                         new_event = event.copy()
                         new_event["id"] = generate_id()
                         new_event["title"] = f"{event['title']} (Copy)"
                         events.append(new_event)
                         save_events(events)
                         st.rerun()
-
-                    if st.button(f"🗑️ {t('delete')}", key=f"del_{event['id']}",
-                                 use_container_width=True):
-                        events = [e for e in events if e.get("id") != event["id"]]
+                with act2:
+                    if st.button(f"🗑️ {t('delete')}", key=f"del_{eid}", use_container_width=True):
+                        events = [e for e in events if e.get("id") != eid]
                         save_events(events)
                         st.rerun()
 
-                st.markdown("---")
-
-                # ── Edit form — balanced 3-column grid ──
-                st.markdown(f"**✏️ {t('edit')}**")
-                with st.form(key=f"edit_{event['id']}"):
-                    ec1, ec2, ec3 = st.columns(3)
-                    with ec1:
-                        e_title = st.text_input(t("title_field"), value=event.get("title", ""))
+                # ── Compact edit form ──
+                with st.form(key=f"edit_{eid}"):
+                    r1c1, r1c2, r1c3, r1c4 = st.columns([3, 3, 2, 2])
+                    with r1c1:
+                        e_title = st.text_input(t("title_field"), value=event.get("title", ""), key=f"ti_{eid}")
+                    with r1c2:
+                        e_venue = st.text_input(t("venue_label"), value=event.get("venue", ""), key=f"ve_{eid}")
+                    with r1c3:
                         e_city = st.selectbox(t("event_city"), CITIES,
                                               index=CITIES.index(event.get("city", "Ashgabat"))
-                                              if event.get("city") in CITIES else 0)
-                    with ec2:
-                        e_venue = st.text_input(t("venue_label"), value=event.get("venue", ""))
+                                              if event.get("city") in CITIES else 0, key=f"ci_{eid}")
+                    with r1c4:
                         e_cat = st.selectbox(t("event_category"), CATEGORIES,
                                              index=CATEGORIES.index(event.get("category", "Music"))
-                                             if event.get("category") in CATEGORIES else 0)
-                    with ec3:
-                        e_price = st.number_input(t("price_label"), value=float(event.get("price", 0)),
-                                                  min_value=0.0, step=5.0)
-                        e_pop = st.slider(t("popularity"), 1, 100,
-                                          int(event.get("popularity", 50)))
+                                             if event.get("category") in CATEGORIES else 0, key=f"ca_{eid}")
 
-                    e_desc = st.text_area(t("event_description"),
-                                          value=event.get("description", ""), height=80)
+                    r2c1, r2c2, r2c3, r2c4 = st.columns(4)
+                    with r2c1:
+                        e_price = st.number_input(t("price_label"), value=float(event.get("price", 0)),
+                                                  min_value=0.0, step=5.0, key=f"pr_{eid}")
+                    with r2c2:
+                        e_pop = st.slider(t("popularity"), 1, 100,
+                                          int(event.get("popularity", 50)), key=f"po_{eid}")
+                    default_lat, default_lon = CITY_COORDS.get(event.get("city", "Ashgabat"), (37.9601, 58.3261))
+                    with r2c3:
+                        e_lat = st.number_input("Lat", value=float(event.get("lat", default_lat)),
+                                                format="%.6f", step=0.001, key=f"lat_{eid}")
+                    with r2c4:
+                        e_lon = st.number_input("Lon", value=float(event.get("lon", default_lon)),
+                                                format="%.6f", step=0.001, key=f"lon_{eid}")
+
+                    dc1, dc2 = st.columns([4, 1])
+                    with dc1:
+                        e_desc = st.text_area(t("event_description"),
+                                              value=event.get("description", ""), height=68, key=f"de_{eid}")
+                    with dc2:
+                        use_center = st.checkbox(t("use_city_center"), key=f"center_{eid}")
 
                     if st.form_submit_button(f"💾 {t('save')}", use_container_width=True):
                         for i, e in enumerate(events):
-                            if e["id"] == event["id"]:
-                                events[i]["title"] = e_title
-                                events[i]["venue"] = e_venue
-                                events[i]["city"] = e_city
-                                events[i]["category"] = e_cat
-                                events[i]["price"] = e_price
-                                events[i]["popularity"] = e_pop
-                                events[i]["description"] = e_desc
-                                lat, lon = CITY_COORDS.get(e_city, (37.9601, 58.3261))
+                            if e["id"] == eid:
+                                events[i].update({
+                                    "title": e_title, "venue": e_venue, "city": e_city,
+                                    "category": e_cat, "price": e_price, "popularity": e_pop,
+                                    "description": e_desc,
+                                })
+                                if use_center:
+                                    lat, lon = CITY_COORDS.get(e_city, (37.9601, 58.3261))
+                                else:
+                                    lat, lon = e_lat, e_lon
                                 events[i]["lat"] = lat
                                 events[i]["lon"] = lon
                                 break
@@ -267,91 +268,97 @@ with tab_events:
                         st.success(f"✅ {t('save')}")
                         st.rerun()
 
-                # ── Image upload (outside form) ──
-                img_up_col, img_preview_col = st.columns([2, 1])
-                with img_up_col:
+                # ── Compact image upload ──
+                iup1, iup2, iup3 = st.columns([3, 1, 1])
+                with iup1:
                     evt_img = st.file_uploader(
-                        f"🖼️ {t('upload_image')}",
-                        type=["jpg", "jpeg", "png", "webp"],
-                        key=f"img_upload_{event['id']}",
-                        label_visibility="collapsed"
+                        t("upload_image"), type=["jpg", "jpeg", "png", "webp"],
+                        key=f"img_upload_{eid}", label_visibility="collapsed"
                     )
-                with img_preview_col:
+                with iup2:
                     if evt_img:
-                        st.image(evt_img, width=140, caption=t("upload_image"))
-
-                if evt_img:
-                    if st.button(f"💾 {t('save')} {t('upload_image')}", key=f"save_img_{event['id']}",
-                                 type="primary", use_container_width=True):
-                        IMG_DIR.mkdir(parents=True, exist_ok=True)
-
-                        img_filename = f"{event['id']}.jpg"
-                        img_path = IMG_DIR / img_filename
-
-                        with open(img_path, "wb") as fimg:
-                            fimg.write(evt_img.getbuffer())
-
-                        try:
-                            from PIL import Image as PILImage
-                            pil_img = PILImage.open(img_path)
-                            if pil_img.mode in ("RGBA", "P"):
-                                pil_img = pil_img.convert("RGB")
-                            pil_img.thumbnail((400, 400), PILImage.LANCZOS)
-                            pil_img.save(img_path, "JPEG", quality=80, optimize=True)
-                        except Exception:
-                            pass
-
-                        from utils.data_loader import _image_cache
-                        old_image = event.get("image", "")
-                        _image_cache.pop(old_image, None)
-                        _image_cache.pop(f"images/{img_filename}", None)
-                        st.cache_data.clear()
-
-                        new_image_path = f"images/{img_filename}"
-                        for i, e in enumerate(events):
-                            if e["id"] == event["id"]:
-                                events[i]["image"] = new_image_path
-                                break
-                        save_events(events)
-                        st.success(f"✅ {t('save')}")
-                        st.rerun()
+                        st.image(evt_img, width=80)
+                with iup3:
+                    if evt_img:
+                        if st.button(f"💾 🖼️", key=f"save_img_{eid}", use_container_width=True):
+                            IMG_DIR.mkdir(parents=True, exist_ok=True)
+                            img_filename = f"{eid}.jpg"
+                            img_path = IMG_DIR / img_filename
+                            with open(img_path, "wb") as fimg:
+                                fimg.write(evt_img.getbuffer())
+                            try:
+                                from PIL import Image as PILImage
+                                pil_img = PILImage.open(img_path)
+                                if pil_img.mode in ("RGBA", "P"):
+                                    pil_img = pil_img.convert("RGB")
+                                pil_img.thumbnail((400, 400), PILImage.LANCZOS)
+                                pil_img.save(img_path, "JPEG", quality=80, optimize=True)
+                            except Exception:
+                                pass
+                            from utils.data_loader import _image_cache
+                            old_image = event.get("image", "")
+                            _image_cache.pop(old_image, None)
+                            _image_cache.pop(f"images/{img_filename}", None)
+                            st.cache_data.clear()
+                            for i, e in enumerate(events):
+                                if e["id"] == eid:
+                                    events[i]["image"] = f"images/{img_filename}"
+                                    break
+                            save_events(events)
+                            st.rerun()
 
     # --- Add New Event form ---
     st.divider()
-    st.markdown(f"### ➕ {t('add_event')}")
+    st.markdown(f"#### ➕ {t('add_event')}")
 
     with st.form("add_event"):
-        ac1, ac2, ac3 = st.columns(3)
-
-        with ac1:
+        nc1, nc2, nc3, nc4 = st.columns([3, 3, 2, 2])
+        with nc1:
             new_title = st.text_input(f"{t('title_field')} *", placeholder="Event name")
-            new_city = st.selectbox(f"{t('event_city')} *", CITIES, key="new_city")
-            new_date_start = st.date_input(f"{t('start_date')} *",
-                                           value=datetime.now().date() + timedelta(days=7))
-            new_time_start = st.time_input(f"{t('start_time')} *",
-                                           value=datetime.strptime("18:00", "%H:%M").time())
-
-        with ac2:
+        with nc2:
             new_venue = st.text_input(f"{t('venue_label')} *", placeholder="Location name")
+        with nc3:
+            new_city = st.selectbox(f"{t('event_city')} *", CITIES, key="new_city")
+        with nc4:
             new_cat = st.selectbox(f"{t('event_category')} *", CATEGORIES, key="new_cat")
-            new_date_end = st.date_input(f"{t('end_date')} *",
-                                         value=datetime.now().date() + timedelta(days=7))
-            new_time_end = st.time_input(f"{t('end_time')} *",
-                                         value=datetime.strptime("21:00", "%H:%M").time())
 
-        with ac3:
-            new_price = st.number_input(t("event_price"), min_value=0.0, step=5.0, value=0.0)
+        nd1, nd2, nd3, nd4, nd5, nd6 = st.columns(6)
+        with nd1:
+            new_date_start = st.date_input(t("start_date"),
+                                           value=datetime.now().date() + timedelta(days=7))
+        with nd2:
+            new_time_start = st.time_input(t("start_time"),
+                                           value=datetime.strptime("18:00", "%H:%M").time())
+        with nd3:
+            new_date_end = st.date_input(t("end_date"),
+                                         value=datetime.now().date() + timedelta(days=7))
+        with nd4:
+            new_time_end = st.time_input(t("end_time"),
+                                         value=datetime.strptime("21:00", "%H:%M").time())
+        with nd5:
+            new_price = st.number_input(t("price_label"), min_value=0.0, step=5.0, value=0.0)
+        with nd6:
             new_pop = st.slider(t("popularity"), 1, 100, 50, key="new_pop")
 
-        new_desc = st.text_area(t("event_description"), placeholder="...", key="new_desc")
+        nl1, nl2, nl3, nl4 = st.columns([3, 1, 1, 1])
+        with nl1:
+            new_desc = st.text_input(t("event_description"), placeholder="Short description...", key="new_desc")
+        with nl2:
+            new_lat = st.number_input("Lat", value=37.9601, format="%.6f", step=0.001, key="new_lat")
+        with nl3:
+            new_lon = st.number_input("Lon", value=58.3261, format="%.6f", step=0.001, key="new_lon")
+        with nl4:
+            new_use_center = st.checkbox(t("use_city_center"), value=True, key="new_center")
 
-        submit = st.form_submit_button(f"➕ {t('add_event')}", use_container_width=True,
-                                       type="primary")
+        submit = st.form_submit_button(f"➕ {t('add_event')}", use_container_width=True, type="primary")
         if submit:
             if not new_title or not new_venue:
                 st.error(f"⚠️ {t('fill_required')}")
             else:
-                lat, lon = CITY_COORDS.get(new_city, (37.9601, 58.3261))
+                if new_use_center:
+                    lat, lon = CITY_COORDS.get(new_city, (37.9601, 58.3261))
+                else:
+                    lat, lon = new_lat, new_lon
                 new_event = {
                     "id": generate_id(),
                     "title": new_title,
