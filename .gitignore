@@ -1,7 +1,8 @@
-venv
-__pycache__
 node_modules/
 .next/
+out/
 .DS_Store
 .env
 .env.local
+*.tsbuildinfo
+next-env.d.ts

@@ -675,7 +675,7 @@
     "venue": "Test",
     "date_start": "2026-05-15T18:00:00",
     "date_end": "2026-05-15T21:00:00",
-    "price": 0.0,
+    "price": 0,
     "popularity": 50,
     "lat": 37.9601,
     "lon": 58.3261,
@@ -691,7 +691,7 @@
     "venue": "Bazzeti",
     "date_start": "2026-05-21T18:00:00",
     "date_end": "2026-05-22T21:00:00",
-    "price": 0.0,
+    "price": 0,
     "popularity": 50,
     "lat": 37.9601,
     "lon": 58.3261,
@@ -710,7 +710,7 @@
     "price": 0,
     "popularity": 88,
     "lat": 37.9607,
-    "lon": 58.3280,
+    "lon": 58.328,
     "image": "images/talyp_gozeli.jpg",
     "description": "Talyp Gözeli — owadan gyzlaryň bäsleşigi, milli lybaslar, zehin we medeniýet baýramçylygy."
   }
