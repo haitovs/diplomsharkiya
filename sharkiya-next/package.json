@@ -1,0 +1,32 @@
+{
+  "name": "sharkiya-next",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4084",
+    "build": "next build",
+    "start": "next start -p 4084",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.577.0",
+    "next": "^14.2.35",
+    "postcss": "^8.5.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.6.0",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0"
+  }
+}
