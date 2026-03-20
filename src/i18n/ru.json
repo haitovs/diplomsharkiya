@@ -166,5 +166,8 @@
   "total_spent": "Всего потрачено",
   "no_tickets_yet": "Билетов пока нет",
   "clear_tickets_confirm": "Вы уверены, что хотите удалить все билеты?",
-  "clear_all_tickets": "Удалить все билеты"
+  "clear_all_tickets": "Удалить все билеты",
+  "back": "Назад",
+  "drag_drop_image": "Перетащите изображение сюда",
+  "or_click_to_browse": "или нажмите для выбора"
 }

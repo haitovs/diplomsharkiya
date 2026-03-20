@@ -166,5 +166,8 @@
   "total_spent": "Total Spent",
   "no_tickets_yet": "No tickets yet",
   "clear_tickets_confirm": "Are you sure you want to clear all tickets?",
-  "clear_all_tickets": "Clear All Tickets"
+  "clear_all_tickets": "Clear All Tickets",
+  "back": "Back",
+  "drag_drop_image": "Drag & drop an image here",
+  "or_click_to_browse": "or click to browse"
 }
