@@ -158,5 +158,13 @@
   "event_deleted": "Событие удалено",
   "all_events_deleted": "Все события удалены",
   "events_imported": "Импортировано {count} событий",
-  "invalid_json_format": "Неверный формат JSON"
+  "invalid_json_format": "Неверный формат JSON",
+  "nav_tickets": "Мои билеты",
+  "tickets_subtitle": "Ваши приобретённые билеты",
+  "total_tickets": "Всего билетов",
+  "unique_events": "Уникальные события",
+  "total_spent": "Всего потрачено",
+  "no_tickets_yet": "Билетов пока нет",
+  "clear_tickets_confirm": "Вы уверены, что хотите удалить все билеты?",
+  "clear_all_tickets": "Удалить все билеты"
 }

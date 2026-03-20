@@ -158,5 +158,13 @@
   "event_deleted": "Çäre pozuldy",
   "all_events_deleted": "Ähli çäreler pozuldy",
   "events_imported": "{count} çäre import edildi",
-  "invalid_json_format": "Nädogry JSON formaty"
+  "invalid_json_format": "Nädogry JSON formaty",
+  "nav_tickets": "Biletlerim",
+  "tickets_subtitle": "Satyn alnan çäre biletleriňiz",
+  "total_tickets": "Jemi biletler",
+  "unique_events": "Üýtgeşik çäreler",
+  "total_spent": "Jemi sarp edilen",
+  "no_tickets_yet": "Entek bilet ýok",
+  "clear_tickets_confirm": "Ähli biletleri pozmak isleýärsiňizmi?",
+  "clear_all_tickets": "Ähli biletleri poz"
 }

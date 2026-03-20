@@ -158,5 +158,13 @@
   "event_deleted": "Event deleted",
   "all_events_deleted": "All events deleted",
   "events_imported": "Imported {count} events",
-  "invalid_json_format": "Invalid JSON format"
+  "invalid_json_format": "Invalid JSON format",
+  "nav_tickets": "My Tickets",
+  "tickets_subtitle": "Your purchased event tickets",
+  "total_tickets": "Total Tickets",
+  "unique_events": "Unique Events",
+  "total_spent": "Total Spent",
+  "no_tickets_yet": "No tickets yet",
+  "clear_tickets_confirm": "Are you sure you want to clear all tickets?",
+  "clear_all_tickets": "Clear All Tickets"
 }

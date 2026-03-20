@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/events", key: "nav_events", icon: "📋" },
   { href: "/map", key: "nav_map", icon: "🗺️" },
   { href: "/saved", key: "nav_saved", icon: "⭐" },
+  { href: "/tickets", key: "nav_tickets", icon: "🎫" },
   { href: "/about", key: "nav_about", icon: "ℹ️" },
   { href: "/admin", key: "nav_admin", icon: "🔧" },
 ];
