@@ -14,5 +14,10 @@ export function loadEvents(): Event[] {
 }
 
 export function saveEvents(events: Event[]): void {
-  fs.writeFileSync(DATA_PATH, JSON.stringify(events, null, 2), "utf-8");
+  // Atomic write: tempfile + rename. Rename needs directory-write perm only,
+  // so this still works if events.json is owned by a different user than the
+  // process (e.g. someone restored it via `git checkout` as root).
+  const tmp = `${DATA_PATH}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(events, null, 2), "utf-8");
+  fs.renameSync(tmp, DATA_PATH);
 }
