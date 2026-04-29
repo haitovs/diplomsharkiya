@@ -11,7 +11,8 @@ interface PaymentDialogProps {
 }
 
 export function PaymentDialog({ event, onClose }: PaymentDialogProps) {
-  const { t } = useTranslation();
+  const { t, tEvent } = useTranslation();
+  const localizedTitle = tEvent(event, "title");
   const { addTransaction } = usePaymentStore();
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -53,7 +54,7 @@ export function PaymentDialog({ event, onClose }: PaymentDialogProps) {
         const cleanCard = cardNumber.replace(/\s/g, "");
         const txnId = addTransaction({
           eventId: event.id,
-          title: event.title,
+          title: localizedTitle,
           amount: event.price,
           name: cardholder.trim(),
           cardLast4: cleanCard.slice(-4),
@@ -78,7 +79,7 @@ export function PaymentDialog({ event, onClose }: PaymentDialogProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-text-secondary">{t("event_title")}</span>
-                <span className="font-semibold">{event.title}</span>
+                <span className="font-semibold">{localizedTitle}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-text-secondary">{t("amount")}</span>
@@ -96,7 +97,7 @@ export function PaymentDialog({ event, onClose }: PaymentDialogProps) {
         ) : (
           <>
             <h3 className="text-xl font-bold mb-1">🎫 {t("payment_form_title")}</h3>
-            <p className="text-text-secondary text-sm mb-1">{event.title}</p>
+            <p className="text-text-secondary text-sm mb-1">{localizedTitle}</p>
             <p className="text-accent-primary font-bold mb-4">{t("amount")}: {Math.round(event.price)} TMT</p>
 
             {errors.length > 0 && (

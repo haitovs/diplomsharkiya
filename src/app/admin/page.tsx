@@ -11,7 +11,7 @@ import type { Event } from "@/types/event";
 import toast from "react-hot-toast";
 
 export default function AdminPage() {
-  const { t, tCat } = useTranslation();
+  const { t, tCat, tCity } = useTranslation();
   const { isAuthenticated, login, logout } = useAdminStore();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,6 +33,12 @@ export default function AdminPage() {
   const [newDateEnd, setNewDateEnd] = useState("");
   const [newUseCityCenter, setNewUseCityCenter] = useState(true);
   const [newImage, setNewImage] = useState<File | null>(null);
+  const [newTitleTk, setNewTitleTk] = useState("");
+  const [newVenueTk, setNewVenueTk] = useState("");
+  const [newDescTk, setNewDescTk] = useState("");
+  const [newTitleRu, setNewTitleRu] = useState("");
+  const [newVenueRu, setNewVenueRu] = useState("");
+  const [newDescRu, setNewDescRu] = useState("");
 
   const fetchEvents = useCallback(async () => {
     const res = await fetch("/api/events");
@@ -69,6 +75,16 @@ export default function AdminPage() {
       return;
     }
     const coords = newUseCityCenter ? CITY_COORDS[newCity] || { lat: 37.9601, lon: 58.3261 } : { lat: 37.9601, lon: 58.3261 };
+    const buildLocale = (tt: string, vv: string, dd: string) => {
+      const obj: { title?: string; venue?: string; description?: string } = {};
+      if (tt.trim()) obj.title = tt.trim();
+      if (vv.trim()) obj.venue = vv.trim();
+      if (dd.trim()) obj.description = dd.trim();
+      return Object.keys(obj).length ? obj : undefined;
+    };
+    const tkBlock = buildLocale(newTitleTk, newVenueTk, newDescTk);
+    const ruBlock = buildLocale(newTitleRu, newVenueRu, newDescRu);
+    const i18n = (tkBlock || ruBlock) ? { ...(tkBlock ? { tk: tkBlock } : {}), ...(ruBlock ? { ru: ruBlock } : {}) } : undefined;
     const body: Record<string, unknown> = {
       title: newTitle, venue: newVenue, city: newCity, category: newCat,
       price: newPrice, popularity: newPop, description: newDesc,
@@ -76,6 +92,7 @@ export default function AdminPage() {
       date_end: newDateEnd || new Date(Date.now() + 7 * 86400000 + 10800000).toISOString().slice(0, 16),
       lat: coords.lat, lon: coords.lon,
       image: `images/cat_${newCat.toLowerCase()}.jpg`,
+      ...(i18n ? { i18n } : {}),
     };
     const res = await fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (res.ok) {
@@ -90,6 +107,8 @@ export default function AdminPage() {
       }
       toast.success(t("event_added"));
       setNewTitle(""); setNewVenue(""); setNewDesc(""); setNewImage(null);
+      setNewTitleTk(""); setNewVenueTk(""); setNewDescTk("");
+      setNewTitleRu(""); setNewVenueRu(""); setNewDescRu("");
       fetchEvents();
     }
   }
@@ -250,7 +269,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <select value={filterCity} onChange={e => setFilterCity(e.target.value)} className="select">
               <option value="All">{t("all_cities")}</option>
-              {CITY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
+              {CITY_NAMES.map(c => <option key={c} value={c}>{tCity(c)}</option>)}
             </select>
             <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="select">
               <option value="All">{t("all_categories")}</option>
@@ -360,6 +379,38 @@ export default function AdminPage() {
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("event_description")}</label>
                 <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} className="input min-h-[100px] resize-y" />
+              </div>
+              <div className="border-t border-border-subtle pt-5">
+                <div className="mb-3">
+                  <h3 className="text-sm font-semibold text-text-primary">🌐 {t("translations")}</h3>
+                  <p className="text-xs text-text-muted mt-0.5">{t("translations_hint")}</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("title_tk")}</label>
+                    <input value={newTitleTk} onChange={e => setNewTitleTk(e.target.value)} className="input" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("title_ru")}</label>
+                    <input value={newTitleRu} onChange={e => setNewTitleRu(e.target.value)} className="input" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("venue_tk")}</label>
+                    <input value={newVenueTk} onChange={e => setNewVenueTk(e.target.value)} className="input" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("venue_ru")}</label>
+                    <input value={newVenueRu} onChange={e => setNewVenueRu(e.target.value)} className="input" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("description_tk")}</label>
+                    <textarea value={newDescTk} onChange={e => setNewDescTk(e.target.value)} className="input min-h-[80px] resize-y" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("description_ru")}</label>
+                    <textarea value={newDescRu} onChange={e => setNewDescRu(e.target.value)} className="input min-h-[80px] resize-y" />
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("upload_image")}</label>
@@ -490,14 +541,32 @@ function EditPage({ event, onSave, onCancel, t, tCat }: {
   const [useCityCenter, setUseCityCenter] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  const [titleTk, setTitleTk] = useState(event.i18n?.tk?.title || "");
+  const [venueTk, setVenueTk] = useState(event.i18n?.tk?.venue || "");
+  const [descTk, setDescTk] = useState(event.i18n?.tk?.description || "");
+  const [titleRu, setTitleRu] = useState(event.i18n?.ru?.title || "");
+  const [venueRu, setVenueRu] = useState(event.i18n?.ru?.venue || "");
+  const [descRu, setDescRu] = useState(event.i18n?.ru?.description || "");
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const coords = useCityCenter ? CITY_COORDS[city] || { lat: event.lat, lon: event.lon } : { lat: event.lat, lon: event.lon };
+    const buildLocale = (tt: string, vv: string, dd: string) => {
+      const obj: { title?: string; venue?: string; description?: string } = {};
+      if (tt.trim()) obj.title = tt.trim();
+      if (vv.trim()) obj.venue = vv.trim();
+      if (dd.trim()) obj.description = dd.trim();
+      return Object.keys(obj).length ? obj : undefined;
+    };
+    const tkBlock = buildLocale(titleTk, venueTk, descTk);
+    const ruBlock = buildLocale(titleRu, venueRu, descRu);
+    const i18n = (tkBlock || ruBlock) ? { ...(tkBlock ? { tk: tkBlock } : {}), ...(ruBlock ? { ru: ruBlock } : {}) } : undefined;
     onSave(event, {
       title, venue, city, category, price, popularity, description,
       date_start: dateStart || event.date_start,
       date_end: dateEnd || event.date_end,
       lat: coords.lat, lon: coords.lon,
+      i18n,
     }, imageFile);
   }
 
@@ -553,6 +622,40 @@ function EditPage({ event, onSave, onCancel, t, tCat }: {
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("event_description")}</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)} className="input min-h-[120px] resize-y" />
+          </div>
+
+          {/* Per-language translations */}
+          <div className="border-t border-border-subtle pt-5">
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold text-text-primary">🌐 {t("translations")}</h3>
+              <p className="text-xs text-text-muted mt-0.5">{t("translations_hint")}</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("title_tk")}</label>
+                <input value={titleTk} onChange={e => setTitleTk(e.target.value)} className="input" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("title_ru")}</label>
+                <input value={titleRu} onChange={e => setTitleRu(e.target.value)} className="input" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("venue_tk")}</label>
+                <input value={venueTk} onChange={e => setVenueTk(e.target.value)} className="input" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("venue_ru")}</label>
+                <input value={venueRu} onChange={e => setVenueRu(e.target.value)} className="input" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("description_tk")}</label>
+                <textarea value={descTk} onChange={e => setDescTk(e.target.value)} className="input min-h-[100px] resize-y" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-text-secondary mb-1.5">{t("description_ru")}</label>
+                <textarea value={descRu} onChange={e => setDescRu(e.target.value)} className="input min-h-[100px] resize-y" />
+              </div>
+            </div>
           </div>
 
           <label className="flex items-center gap-2 text-sm text-text-secondary">

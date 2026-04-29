@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import en from "./en.json";
 import ru from "./ru.json";
 import tk from "./tk.json";
-import type { Locale } from "@/types/event";
+import type { Event, Locale } from "@/types/event";
 
 const messages: Record<Locale, Record<string, string>> = { en, ru, tk };
 
@@ -47,5 +47,17 @@ export function useTranslation() {
     return t(`cat_${category}`) || category;
   }
 
-  return { t, tCat, locale, setLocale };
+  function tCity(city: string): string {
+    const key = `city_${city}`;
+    const translated = messages[locale]?.[key];
+    return translated || city;
+  }
+
+  function tEvent(event: Event, field: "title" | "description" | "venue"): string {
+    const localized = event.i18n?.[locale]?.[field];
+    if (localized && localized.trim().length > 0) return localized;
+    return event[field] || "";
+  }
+
+  return { t, tCat, tCity, tEvent, locale, setLocale };
 }

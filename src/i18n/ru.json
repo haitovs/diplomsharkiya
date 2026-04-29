@@ -169,5 +169,19 @@
   "clear_all_tickets": "Удалить все билеты",
   "back": "Назад",
   "drag_drop_image": "Перетащите изображение сюда",
-  "or_click_to_browse": "или нажмите для выбора"
+  "or_click_to_browse": "или нажмите для выбора",
+  "city_Ashgabat": "Ашхабад",
+  "city_Mary": "Мары",
+  "city_Türkmenabat": "Туркменабат",
+  "city_Dashoguz": "Дашогуз",
+  "city_Balkanabat": "Балканабат",
+  "city_Awaza": "Аваза",
+  "translations": "Переводы",
+  "translations_hint": "Необязательно. Если пусто, на этом языке будет показан исходный текст.",
+  "title_tk": "Название (туркменский)",
+  "title_ru": "Название (русский)",
+  "venue_tk": "Место (туркменский)",
+  "venue_ru": "Место (русский)",
+  "description_tk": "Описание (туркменский)",
+  "description_ru": "Описание (русский)"
 }

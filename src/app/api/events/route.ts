@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     image: body.image || "images/event_default.jpg",
     description: body.description || "",
     icon: body.icon || "",
+    ...(body.i18n ? { i18n: body.i18n } : {}),
   };
   events.push(newEvent);
   saveEvents(events);

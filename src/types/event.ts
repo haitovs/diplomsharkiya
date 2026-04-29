@@ -1,3 +1,9 @@
+export interface EventTranslation {
+  title?: string;
+  description?: string;
+  venue?: string;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -13,6 +19,11 @@ export interface Event {
   image: string;
   description: string;
   icon?: string;
+  i18n?: {
+    en?: EventTranslation;
+    ru?: EventTranslation;
+    tk?: EventTranslation;
+  };
 }
 
 export interface FilterState {

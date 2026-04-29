@@ -7,7 +7,7 @@ import { CITY_NAMES } from "@/config/cities";
 import { DATE_PRESETS, SORT_OPTIONS, PRICE_RANGE } from "@/config/constants";
 
 export function FilterPanel() {
-  const { t, tCat } = useTranslation();
+  const { t, tCat, tCity } = useTranslation();
   const {
     city, categories, datePreset, maxPrice, searchQuery, sortBy,
     setCity, toggleCategory, setDatePreset, setMaxPrice, setSearchQuery, setSortBy, resetFilters,
@@ -37,7 +37,7 @@ export function FilterPanel() {
         >
           <option value="All Cities">{t("all_cities")}</option>
           {CITY_NAMES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{tCity(c)}</option>
           ))}
         </select>
       </div>

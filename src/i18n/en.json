@@ -169,5 +169,19 @@
   "clear_all_tickets": "Clear All Tickets",
   "back": "Back",
   "drag_drop_image": "Drag & drop an image here",
-  "or_click_to_browse": "or click to browse"
+  "or_click_to_browse": "or click to browse",
+  "city_Ashgabat": "Ashgabat",
+  "city_Mary": "Mary",
+  "city_Türkmenabat": "Türkmenabat",
+  "city_Dashoguz": "Dashoguz",
+  "city_Balkanabat": "Balkanabat",
+  "city_Awaza": "Awaza",
+  "translations": "Translations",
+  "translations_hint": "Optional. If left empty, the original text is shown for that language.",
+  "title_tk": "Title (Türkmen)",
+  "title_ru": "Title (Russian)",
+  "venue_tk": "Venue (Türkmen)",
+  "venue_ru": "Venue (Russian)",
+  "description_tk": "Description (Türkmen)",
+  "description_ru": "Description (Russian)"
 }

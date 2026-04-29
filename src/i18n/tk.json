@@ -169,5 +169,19 @@
   "clear_all_tickets": "Ähli biletleri poz",
   "back": "Yza",
   "drag_drop_image": "Suraty şu ýere süýräň",
-  "or_click_to_browse": "ýa-da saýlamak üçin basyň"
+  "or_click_to_browse": "ýa-da saýlamak üçin basyň",
+  "city_Ashgabat": "Aşgabat",
+  "city_Mary": "Mary",
+  "city_Türkmenabat": "Türkmenabat",
+  "city_Dashoguz": "Daşoguz",
+  "city_Balkanabat": "Balkanabat",
+  "city_Awaza": "Awaza",
+  "translations": "Terjimeler",
+  "translations_hint": "Hökmany däl. Boş galsa, şol dil üçin asyl tekst görkezilýär.",
+  "title_tk": "Ady (Türkmençe)",
+  "title_ru": "Ady (Rusça)",
+  "venue_tk": "Ýer (Türkmençe)",
+  "venue_ru": "Ýer (Rusça)",
+  "description_tk": "Beýany (Türkmençe)",
+  "description_ru": "Beýany (Rusça)"
 }

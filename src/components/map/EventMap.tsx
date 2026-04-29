@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { CATEGORIES } from "@/config/categories";
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from "@/config/cities";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
+import { useTranslation } from "@/i18n/config";
 import type { Event } from "@/types/event";
 
 interface EventMapProps {
@@ -19,6 +20,7 @@ declare global {
 }
 
 export function EventMap({ events, onBuyTicket }: EventMapProps) {
+  const { t, tCat, tEvent } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -124,20 +126,25 @@ export function EventMap({ events, onBuyTicket }: EventMapProps) {
         iconAnchor: [15, 15],
       });
 
+      const evTitle = tEvent(event, "title");
+      const evVenue = tEvent(event, "venue");
+      const freeText = t("free");
+      const buyText = t("buy_ticket");
+
       const buyBtn = event.price > 0 && onBuyTicket
-        ? `<button onclick="window.__mapBuyTicket('${event.id}')" style="margin-top:8px;width:100%;padding:6px 0;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🎫 Buy Ticket — ${formatPrice(event.price)}</button>`
+        ? `<button onclick="window.__mapBuyTicket('${event.id}')" style="margin-top:8px;width:100%;padding:6px 0;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🎫 ${buyText} — ${formatPrice(event.price, freeText)}</button>`
         : event.price === 0
-          ? `<div style="margin-top:8px;text-align:center;padding:4px 0;background:#ECFDF5;color:#059669;border-radius:6px;font-size:12px;font-weight:600">Free</div>`
+          ? `<div style="margin-top:8px;text-align:center;padding:4px 0;background:#ECFDF5;color:#059669;border-radius:6px;font-size:12px;font-weight:600">${freeText}</div>`
           : "";
 
       const popupHtml = `
         <div style="font-family:Inter,sans-serif;min-width:200px;">
-          <h4 style="margin:0 0 6px;font-size:14px;font-weight:600;color:#1E293B">${event.title}</h4>
-          <p style="margin:2px 0;color:#64748B;font-size:12px">📍 ${event.venue}</p>
+          <h4 style="margin:0 0 6px;font-size:14px;font-weight:600;color:#1E293B">${evTitle}</h4>
+          <p style="margin:2px 0;color:#64748B;font-size:12px">📍 ${evVenue}</p>
           <p style="margin:2px 0;color:#64748B;font-size:12px">📅 ${formatDate(event.date_start)} ${formatTime(event.date_start)}</p>
           <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px">
-            <span style="background:#E2E8F0;padding:2px 8px;border-radius:4px">${event.category}</span>
-            <span style="font-weight:bold;color:#6366F1">${formatPrice(event.price)}</span>
+            <span style="background:#E2E8F0;padding:2px 8px;border-radius:4px">${tCat(event.category)}</span>
+            <span style="font-weight:bold;color:#6366F1">${formatPrice(event.price, freeText)}</span>
           </div>
           ${buyBtn}
         </div>
@@ -145,7 +152,7 @@ export function EventMap({ events, onBuyTicket }: EventMapProps) {
 
       const marker = L.marker([event.lat, event.lon], { icon: divIcon })
         .bindPopup(popupHtml, { maxWidth: 300 })
-        .bindTooltip(event.title)
+        .bindTooltip(evTitle)
         .addTo(map);
 
       markersRef.current.push(marker);
@@ -157,7 +164,7 @@ export function EventMap({ events, onBuyTicket }: EventMapProps) {
     } else if (bounds.length === 1) {
       map.setView(bounds[0], 13);
     }
-  }, [events, onBuyTicket]);
+  }, [events, onBuyTicket, t, tCat, tEvent]);
 
   return (
     <div

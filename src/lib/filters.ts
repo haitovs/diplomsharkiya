@@ -53,11 +53,17 @@ export function applyFilters(events: Event[], filters: FilterState): Event[] {
   // Search
   if (filters.searchQuery) {
     const q = filters.searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      e =>
-        e.title.toLowerCase().includes(q) ||
-        e.venue.toLowerCase().includes(q)
-    );
+    filtered = filtered.filter(e => {
+      const haystack: string[] = [e.title, e.venue, e.description || ""];
+      if (e.i18n) {
+        for (const loc of Object.values(e.i18n)) {
+          if (loc?.title) haystack.push(loc.title);
+          if (loc?.venue) haystack.push(loc.venue);
+          if (loc?.description) haystack.push(loc.description);
+        }
+      }
+      return haystack.some(s => s.toLowerCase().includes(q));
+    });
   }
 
   return filtered;

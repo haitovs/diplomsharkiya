@@ -14,7 +14,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, onBuyTicket }: EventCardProps) {
-  const { t, tCat } = useTranslation();
+  const { t, tCat, tCity, tEvent } = useTranslation();
   const { isSaved, toggleSave } = useUIStore();
   const { getEventPurchaseCount } = usePaymentStore();
   const saved = isSaved(event.id);
@@ -23,6 +23,9 @@ export function EventCard({ event, onBuyTicket }: EventCardProps) {
   const catIcon = config?.icon || "📌";
   const catHex = config?.hex || "#6366F1";
   const isFree = event.price === 0;
+  const title = tEvent(event, "title");
+  const venue = tEvent(event, "venue");
+  const description = tEvent(event, "description");
 
   return (
     <div className="evt-card" style={{ borderLeft: `4px solid ${catHex}` }}>
@@ -31,7 +34,7 @@ export function EventCard({ event, onBuyTicket }: EventCardProps) {
         <div className="relative w-[28%] min-h-[110px] shrink-0">
           <Image
             src={`/images/${event.image.replace("images/", "")}`}
-            alt={event.title}
+            alt={title}
             fill
             className="object-cover"
             sizes="200px"
@@ -50,12 +53,12 @@ export function EventCard({ event, onBuyTicket }: EventCardProps) {
             </span>
           </div>
 
-          <h4 className="text-lg font-semibold text-text-primary truncate">{event.title}</h4>
+          <h4 className="text-lg font-semibold text-text-primary truncate">{title}</h4>
           <p className="text-sm text-text-secondary mt-1 truncate">
-            📍 {event.venue} · {event.city} &nbsp; 📅 {formatDate(event.date_start)} · {formatTime(event.date_start)}
+            📍 {venue} · {tCity(event.city)} &nbsp; 📅 {formatDate(event.date_start)} · {formatTime(event.date_start)}
           </p>
-          {event.description && (
-            <p className="text-sm text-text-secondary mt-1 line-clamp-2">{event.description}</p>
+          {description && (
+            <p className="text-sm text-text-secondary mt-1 line-clamp-2">{description}</p>
           )}
 
           {/* Action buttons */}

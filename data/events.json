@@ -60,7 +60,19 @@
     "lon": 58.3007,
     "image": "images/cat_sports.jpg",
     "description": "Local teams face off in an exciting match — expect an electrifying atmosphere.",
-    "icon": "sports"
+    "icon": "sports",
+    "i18n": {
+      "tk": {
+        "title": "Futbol Çempionaty",
+        "venue": "Aşgabat Olimpiýa stadiony",
+        "description": "Ýerli toparlar gyzgalaňly oýunda ýüzbe-ýüz bolýar — joşgunly atmosfera garaşyň."
+      },
+      "ru": {
+        "title": "Чемпионат по футболу",
+        "venue": "Олимпийский стадион Ашхабада",
+        "description": "Местные команды встречаются в захватывающем матче."
+      }
+    }
   },
   {
     "id": "evt005",
