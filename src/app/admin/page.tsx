@@ -145,7 +145,7 @@ export default function AdminPage() {
     const confirmed = prompt(t("confirm_delete"));
     if (confirmed === "DELETE") {
       await fetch("/api/events", { method: "DELETE" });
-      fetchEvents();
+      await fetchEvents();
       toast.success(t("all_events_deleted"));
     }
   }
@@ -154,16 +154,36 @@ export default function AdminPage() {
     const text = await file.text();
     try {
       const imported = JSON.parse(text);
-      if (Array.isArray(imported)) {
-        for (const ev of imported) {
-          const existing = events.find(e => e.id === ev.id);
-          if (!existing) {
-            await fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ev) });
-          }
-        }
-        fetchEvents();
-        toast.success(t("events_imported", { count: String(imported.length) }));
+      if (!Array.isArray(imported)) {
+        toast.error(t("invalid_json_format"));
+        return;
       }
+      // Read live server state, not stale React state
+      const currentRes = await fetch("/api/events");
+      const current: Event[] = await currentRes.json();
+      const existingIds = new Set(current.map(e => e.id));
+      let inserted = 0;
+      let updated = 0;
+      for (const ev of imported) {
+        if (ev.id && existingIds.has(ev.id)) {
+          // Update — merge new fields onto existing event
+          const res = await fetch(`/api/events/${ev.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(ev),
+          });
+          if (res.ok) updated++;
+        } else {
+          const res = await fetch("/api/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(ev),
+          });
+          if (res.ok) inserted++;
+        }
+      }
+      await fetchEvents();
+      toast.success(t("events_imported", { count: String(inserted + updated) }));
     } catch {
       toast.error(t("invalid_json_format"));
     }

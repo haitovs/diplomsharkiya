@@ -6,7 +6,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   const events = loadEvents();
   const idx = events.findIndex(e => e.id === params.id);
   if (idx === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  events[idx] = { ...events[idx], ...body, id: params.id };
+  const merged: Record<string, unknown> = { ...events[idx], ...body, id: params.id };
+  for (const [k, v] of Object.entries(merged)) {
+    if (v === null) delete merged[k];
+  }
+  events[idx] = merged as unknown as typeof events[number];
   saveEvents(events);
   return NextResponse.json(events[idx]);
 }
